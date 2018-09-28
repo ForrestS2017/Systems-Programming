@@ -2,13 +2,13 @@
  * simpleCSVsorter.c
  *
  *  Created on: Sep 20, 2018
- *      Author: justc
+ *      Author: Justin Chan, Forrest Smith
  */
+#include "simpleCSVsorter.h"
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 int main(int argc, char ** argv) {
+	printf("%d", 69);
+
 	return 0;
 }
