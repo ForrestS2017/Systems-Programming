@@ -60,7 +60,7 @@ int main(int argc, char ** argv) {
 	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobeï¿½\""));
 
 	// Get column titles
-	char** headers = GetLine();
+	//char** headers = GetLine();
 	//printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
 	//printf("\nROWCOUNT == %d", rowcount);
@@ -90,9 +90,9 @@ int main(int argc, char ** argv) {
 char** GetLine() {
 
 	// Use getLine to get current line and store in "line" variable
-	size_t length = 0;
+	//size_t length = 0;
 	char* line = NULL;
-	size_t r = getline(&line, &length, stdin);
+	//size_t r = getline(&line, &length, stdin);
 	if (feof(stdin)) {
 		//printf("**EOF**\n");
 		//free(line);
