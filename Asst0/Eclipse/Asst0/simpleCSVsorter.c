@@ -1,4 +1,5 @@
 /*
+ *
  * simpleCSVsorter.c
  *
  *  Created on: Sep 20, 2018
@@ -60,7 +61,7 @@ int main(int argc, char ** argv) {
 	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe�\""));
 
 	// Get column titles
-	char** headers = GetLine();
+	/*char** headers =*/ GetLine();
 	//printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
 	//printf("\nROWCOUNT == %d", rowcount);
