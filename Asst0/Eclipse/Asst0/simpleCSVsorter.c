@@ -56,6 +56,9 @@ int main(int argc, char ** argv) {
 	free(c);
 	free(Rows);*/
 
+	// Check for weird space
+	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe \""));
+
 	// Get column titles
 
 	char** headers = GetLine();
