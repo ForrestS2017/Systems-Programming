@@ -60,7 +60,7 @@ int main(int argc, char ** argv) {
 	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobeï¿½\""));
 
 	// Get column titles
-	//char** headers = GetLine();
+	char** headers = GetLine();
 	//printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
 	//printf("\nROWCOUNT == %d", rowcount);
