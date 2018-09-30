@@ -61,10 +61,21 @@ int main(int argc, char ** argv) {
 
 	// Get column titles
 	char** headers = GetLine();
-	printf("FIND: %s\n", argv[2]);
+	//printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
-	printf("\nROWCOUNT == %d", rowcount);
-	printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
+	//printf("\nROWCOUNT == %d", rowcount);
+	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
+	int p = 0;
+	int o = 0;
+
+	for( o = 0; o < rowcount; o++){
+		printf("%d) ",o);
+		for(p = 0; p < 12; p++){
+			printf("%s | ", Rows[o].entries[p]);
+		}
+		printf("\n");
+	}
+
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
@@ -83,11 +94,11 @@ char** GetLine() {
 	char* line = NULL;
 	size_t r = getline(&line, &length, stdin);
 	if (feof(stdin)) {
-		printf("**EOF**\n");
+		//printf("**EOF**\n");
 		//free(line);
 		return NULL;
 	}
-	printf("\n[%zu]LINE: %s", r, line);
+	//printf("\n[%zu]LINE: %s", r, line);
 
 	// Create 2D array to hold each entry
 	int quotes = 0;
@@ -113,7 +124,8 @@ char** GetLine() {
 		size_t entrylength = 30;
 		char* entry = (char*) malloc(entrylength * sizeof(char));
 
-		for (int a = 0; a < entrylength; a++) {
+		int a = 0;
+		for (a = 0; a < entrylength; a++) {
 			entry[a] = '\0';
 		}
 
@@ -139,14 +151,14 @@ char** GetLine() {
 			if (i >= entrylength) {
 				entrylength *= 2;
 				entry = realloc(entry, sizeof(char) * entrylength);
-				for (int b = entrylength / 2 + 1; b < entrylength; b++) {
-					entry[b] = '\0';
+				for (a = entrylength / 2 + 2; a < entrylength; a++) {
+					entry[a] = '\0';
 				}
 			}
 		}
 		entries[position] = entry;
 //		printf("ENTRIES 0: %s\n", entries[0]);
-		printf("(%d)%s | ", position, entries[position]);
+		//*****printf("(%d)%s | ", position, entries[position]);
 		//printf("%s\n", entries[0]);
 		position++;
 	}
@@ -158,29 +170,36 @@ char** GetLine() {
 int FillRows() {
 	int rows = 0;
 	int capacity = 1;
+	int w = 0;
 	Rows = (Row*)malloc(capacity * sizeof(Row));
+	for (w = 0; w < capacity; w++) {
+		Rows[w].entries = NULL;
+	}
 
 	while (1) {
 		//printf("hi\n");
 		char** entries = GetLine();
 		if (entries == NULL) {
-			fprintf(stdout, "\nEOF FILLROWS\n");
+			//fprintf(stdout, "\nEOF FILLROWS\n");
 			//printf("END FILLROWS 1");
-			printf("\nFILLROWS: %d", rows);
+			//printf("\nFILLROWS: %d", rows);
 			return rows;
 		}
 		//printf("ENTRY: %s\n", entries[0]);
 		Rows[rows].entries = entries;
 		//printf("STRUCT: %s\n", entries[2]);
 		rows++;
-		printf("ROW: %d\n", rows);
+		//printf("ROW: %d\n", rows);
 
-		if( rows >= capacity) {
+		if (rows >= capacity) {
 			capacity *= 2;
 			Rows = realloc(Rows, capacity * sizeof(Row));
+			for (w = capacity / 2 + 2; w < capacity; w++) {
+				Rows[w].entries = NULL;
+			}
 		}
 	}
-	printf("END FILLROWS 2");
+	//printf("END FILLROWS 2");
 	return rows;
 }
 
