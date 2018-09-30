@@ -60,10 +60,10 @@ int main(int argc, char ** argv) {
 	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobeï¿½\""));
 
 	// Get column titles
-	//char** headers = GetLine();
+	/*char** headers = GetLine();*/
 	//printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
-	//printf("\nROWCOUNT == %d", rowcount);
+	/*//printf("\nROWCOUNT == %d", rowcount);
 	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
 	int p = 0;
 	int o = 0;
@@ -79,7 +79,7 @@ int main(int argc, char ** argv) {
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
-	printf("\n");
+	printf("\n");*/
 	return 0;
 }
 
