@@ -81,16 +81,14 @@ char** GetLine() {
 	// Use getLine to get current line and store in "line" variable
 	size_t length = 0;
 	char* line = NULL;
-	//printf("hello\n");
 	size_t r = getline(&line, &length, stdin);
-	//printf("hello 2\n");
 	if (feof(stdin)) {
 		printf("**EOF**\n");
 		//free(line);
 		return NULL;
 	}
-	printf("hello 3\n");
-	printf("\n[%zu]LINE: %s\n", r, line);
+	printf("\n[%zu]LINE: %s", r, line);
+
 	// Create 2D array to hold each entry
 	int quotes = 0;
 	int arrsize = 1;
@@ -102,13 +100,11 @@ char** GetLine() {
 	size_t linepos = 0;
 	size_t linelength = strlen(line);
 
-	//printf("%d>>%s", r, line);
 	// While still entering entries
 	while (linepos < linelength) {
-		//if(position >= 12) return NULL;
+
 		// If we have more entries than array size, double array length
 		if (position >= arrsize) {
-			//printf("123129837928173987 %s | ", entries[0]);
 			arrsize *= 2;
 			entries = realloc(entries, sizeof(char *) * arrsize);
 		}
@@ -116,9 +112,13 @@ char** GetLine() {
 		i = 0;
 		size_t entrylength = 30;
 		char* entry = (char*) malloc(entrylength * sizeof(char));
+
+		for (int a = 0; a < entrylength; a++) {
+			entry[a] = '\0';
+		}
+
 		// While reading from the entries line
 		while (linepos < linelength) {
-			//printf("helo %s | ", entries[0]);
 			char c = line[linepos];
 
 			// Check for quotes
@@ -133,32 +133,25 @@ char** GetLine() {
 				break;
 			}
 			entry[i] = line[linepos];
-			//printf("%s> ", entry);
 
 			i++;
 			linepos++;
 			if (i >= entrylength) {
 				entrylength *= 2;
 				entry = realloc(entry, sizeof(char) * entrylength);
+				for (int b = entrylength / 2 + 1; b < entrylength; b++) {
+					entry[b] = '\0';
+				}
 			}
 		}
-//if (position > 0) {
-//		printf("right before %s | ", entries[0]);
-//		printf("%d\n", position);
-//		printf("ENTRY: %s\n", entry);
-//		printf("array size: %d\n", arrsize);
-//		printf("address of entries[0]: %p", entries[0]);
-//		printf("address of entries[position]: %p", entries[position]);
-//}
 		entries[position] = entry;
-//		printf("Address of entries[0]: %p", entries[0]);
 //		printf("ENTRIES 0: %s\n", entries[0]);
 		printf("(%d)%s | ", position, entries[position]);
-		printf("%s\n", entries[0]);
+		//printf("%s\n", entries[0]);
 		position++;
 	}
 
-	printf("\nPRE-ENTRY: (%s)\n", entries[0]);
+	//printf("\n\nPRE-ENTRY: (%s)\n", entries[0]);
 	return entries;
 }
 
@@ -168,17 +161,17 @@ int FillRows() {
 	Rows = (Row*)malloc(capacity * sizeof(Row));
 
 	while (1) {
-		printf("hi\n");
+		//printf("hi\n");
 		char** entries = GetLine();
 		if (entries == NULL) {
 			fprintf(stdout, "\nEOF FILLROWS\n");
-			printf("END FILLROWS 1");
+			//printf("END FILLROWS 1");
 			printf("\nFILLROWS: %d", rows);
 			return rows;
 		}
-		printf("ENTRY: %s\n", entries[0]);
+		//printf("ENTRY: %s\n", entries[0]);
 		Rows[rows].entries = entries;
-		printf("STRUCT: %s\n", entries[2]);
+		//printf("STRUCT: %s\n", entries[2]);
 		rows++;
 		printf("ROW: %d\n", rows);
 
