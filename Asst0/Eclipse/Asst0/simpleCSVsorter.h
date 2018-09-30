@@ -14,18 +14,24 @@
 #ifndef SIMPLECSVSORTER_H_
 #define SIMPLECSVSORTER_H_
 
-typedef enum _format{NUM, STR} format;
+typedef enum _format{ NUM, STR } format;
 
-typedef struct Column {		// Only for first row data
+typedef struct _Header {		// Only for first row data
 	char* entry;			// Hold the titles of each column
-	format type;		// Declare the types of each column, corresponds with row entry
-} Column;
+	format* types;		// Declare the types of each column, corresponds with row entry
+} Header;
 
-typedef struct Row {
-	char** entry;			// Hold each entry of the row. The type of each corresponds to format enum
+typedef struct _Row {
+	char** entries;			// Hold each entry of the row. The type of each corresponds to format enum
 } Row;
 
-Column* Columns;
+Header header;
 Row* Rows;
+
+int stringComparator(void*, void*);
+
+int intComparator(void*, void*);
+
+int mergeSort(char*, format);
 
 #endif /* SIMPLECSVSORTER_H_ */
