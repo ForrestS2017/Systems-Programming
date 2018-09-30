@@ -14,6 +14,8 @@
 #ifndef SIMPLECSVSORTER_H_
 #define SIMPLECSVSORTER_H_
 
+/***** Variables, Structs, Prototypes *****/
+
 typedef enum _format{ NUM, STR } format;
 
 typedef struct _Header {		// Only for first row data
@@ -32,6 +34,13 @@ int stringComparator(void*, void*);
 
 int intComparator(void*, void*);
 
-int mergeSort(char*, format);
+char* mergeSort(Row * row, int i, format f);
+
+Header Head;
+Row* Rows;
+
+/***** Functions *****/
+
+char* GetLine();
 
 #endif /* SIMPLECSVSORTER_H_ */
