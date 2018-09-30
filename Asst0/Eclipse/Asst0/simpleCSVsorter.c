@@ -90,9 +90,9 @@ int main(int argc, char ** argv) {
 char** GetLine() {
 
 	// Use getLine to get current line and store in "line" variable
-	size_t length = 0;
+	//size_t length = 0;
 	char* line = NULL;
-	size_t r = getline(&line, &length, stdin);
+	//size_t r = getline(&line, &length, stdin);
 	if (feof(stdin)) {
 		//printf("**EOF**\n");
 		//free(line);
