@@ -68,8 +68,6 @@ int main(int argc, char ** argv) {
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
-// Testing mergeSort
-// char ** ee = { "" };
 	printf("\n");
 	return 0;
 }
