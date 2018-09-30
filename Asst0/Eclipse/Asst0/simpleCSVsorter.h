@@ -16,7 +16,7 @@
 
 /***** Variables, Structs, Prototypes *****/
 
-typedef enum _format{ NUM, STR } format;
+typedef enum _format{ STRING, INTEGER, DOUBLE } format;
 
 typedef struct _Header {		// Only for first row data
 	char* entry;			// Hold the titles of each column
@@ -32,11 +32,29 @@ Row* Rows;
 
 /***** Functions *****/
 
+// Compares two strings
 int stringComparator(void*, void*);
 
+// Compares two integers
 int intComparator(void*, void*);
 
-char* mergeSort(Row * row, int i, format f);
+// Compares two doubles
+int doubleComparator(void*, void*);
+
+// Trims white space and removes quotation marks from a string
+char* formatString(char*);
+
+// Reads an int from a string
+int parseInt(char*);
+
+// Reads a double from a string
+double parseDouble(char*);
+
+// Merges two arrays of rows. Used for merge sort
+Row* merge(Row*, int, Row*, int, int, format);
+
+// Sorts an array of Rows using merge sort
+Row* mergeSort(Row*, int, int, format);
 
 char** GetLine();
 

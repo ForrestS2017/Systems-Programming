@@ -20,6 +20,8 @@ int main(int argc, char ** argv) {
 	int targetCol = GetIndex(headers, argv[2]);
 	printf("%d", targetCol);
 
+	// Testing mergeSort
+	//char ** ee = { "" };
 
 	return 0;
 }
