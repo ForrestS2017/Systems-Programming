@@ -38,11 +38,12 @@ int doubleComparator(void* n1, void* n2) {
 }
 
 /**
- * Parses a string and trims white space and quotation marks
+ * Trims white space and removes quotation marks from a string
  * @param str String to parse
- * @return Altered string
+ * @return Formatted string
  */
-char* parseString(char* str) {
+char* formatString(char* str) {
+	int length = strlen(str);
 	return 0;
 }
 
@@ -81,23 +82,36 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 	int rIndex = 0; // Current index in right array
 	int aIndex = 0; // Current index in auxiliary array
 
-	int (*comparator)(void*, void*);
 	if (f == INTEGER) {
-		comparator = intComparator;
+		while (lIndex < length1 && rIndex < length2) {
+			if (intComparator(parseInt(arrows1[lIndex].entries[index]), parseInt(arrows2[rIndex].entries[index])) < 0) {
+				result[aIndex++] = arrows1[lIndex++];
+			} else {
+				result[aIndex++] = arrows2[rIndex++];
+			}
+		}
 	} else if (f == DOUBLE) {
-		comparator = doubleComparator;
+		while (lIndex < length1 && rIndex < length2) {
+			if (doubleComparator(parseDouble(arrows1[lIndex].entries[index]), parseDouble(arrows2[rIndex].entries[index])) < 0) {
+				result[aIndex++] = arrows1[lIndex++];
+			} else {
+				result[aIndex++] = arrows2[rIndex++];
+			}
+		}
 	} else if (f == STRING) {
-		comparator = stringComparator;
+		while (lIndex < length1 && rIndex < length2) {
+			char* s1 = formatString(arrows1[lIndex].entries[index]);
+			char* s2 = formatString(arrows2[rIndex].entries[index]);
+			if (stringComparator(s1, s2) < 0) {
+				result[aIndex++] = arrows1[lIndex++];
+			} else {
+				result[aIndex++] = arrows2[rIndex++];
+			}
+			free(s1);
+			free(s2);
+		}
 	} else {
 		return NULL;
-	}
-
-	while (lIndex < length1 && rIndex < length2) {
-		if (comparator(arrows1[lIndex].entries[index], arrows2[rIndex].entries[index]) < 0) {
-			result[aIndex++] = arrows1[lIndex++];
-		} else {
-			result[aIndex++] = arrows2[rIndex++];
-		}
 	}
 
 	while (lIndex < length1) {

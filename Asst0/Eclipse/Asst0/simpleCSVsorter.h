@@ -41,8 +41,8 @@ int intComparator(void*, void*);
 // Compares two doubles
 int doubleComparator(void*, void*);
 
-// Parses a string and removes white space and quotation marks
-char* parseString(char*);
+// Trims white space and removes quotation marks from a string
+char* formatString(char*);
 
 // Reads an int from a string
 int parseInt(char*);
