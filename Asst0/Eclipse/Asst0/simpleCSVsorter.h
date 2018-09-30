@@ -19,7 +19,7 @@
 typedef enum _format{ STRING, INTEGER, DOUBLE } format;
 
 typedef struct _Header {		// Only for first row data
-	char* entry;			// Hold the titles of each column
+	char** titles;			// Hold the titles of each column
 	format* types;		// Declare the types of each column, corresponds with row entry
 } Header;
 

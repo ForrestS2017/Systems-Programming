@@ -107,35 +107,59 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 
 	if (f == INTEGER) {
 		while (lIndex < length1 && rIndex < length2) {
-			int n1 = atoi(arrows1[lIndex].entries[index]);
-			int n2 = atoi(arrows2[rIndex].entries[index]);
-			if (intComparator(&n1, &n2) < 0) {
+			char* e1 = arrows1[lIndex].entries[index];
+			char* e2 = arrows2[rIndex].entries[index];
+			if (strcmp(e1, "") == 0) {
 				result[aIndex++] = arrows1[lIndex++];
-			} else {
+			} else if (strcmp(e2, "") == 0) {
 				result[aIndex++] = arrows2[rIndex++];
+			} else {
+				int n1 = atoi(e1);
+				int n2 = atoi(e2);
+				if (intComparator(&n1, &n2) < 0) {
+					result[aIndex++] = arrows1[lIndex++];
+				} else {
+					result[aIndex++] = arrows2[rIndex++];
+				}
 			}
 		}
 	} else if (f == DOUBLE) {
 		while (lIndex < length1 && rIndex < length2) {
-			double d1 = atof(arrows1[lIndex].entries[index]);
-			double d2 = atof(arrows2[rIndex].entries[index]);
-			if (doubleComparator(&d1, &d2) < 0) {
+			char* e1 = arrows1[lIndex].entries[index];
+			char* e2 = arrows2[rIndex].entries[index];
+			if (strcmp(e1, "") == 0) {
 				result[aIndex++] = arrows1[lIndex++];
-			} else {
+			} else if (strcmp(e2, "") == 0) {
 				result[aIndex++] = arrows2[rIndex++];
+			} else {
+				double d1 = atof(e1);
+				double d2 = atof(e2);
+				if (doubleComparator(&d1, &d2) < 0) {
+					result[aIndex++] = arrows1[lIndex++];
+				} else {
+					result[aIndex++] = arrows2[rIndex++];
+				}
 			}
 		}
 	} else if (f == STRING) {
 		while (lIndex < length1 && rIndex < length2) {
-			char* s1 = trim(arrows1[lIndex].entries[index]);
-			char* s2 = trim(arrows2[rIndex].entries[index]);
-			if (stringComparator(s1, s2) < 0) {
+			char* e1 = arrows1[lIndex].entries[index];
+			char* e2 = arrows2[rIndex].entries[index];
+			if (strcmp(e1, "") == 0) {
 				result[aIndex++] = arrows1[lIndex++];
-			} else {
+			} else if (strcmp(e2, "") == 0) {
 				result[aIndex++] = arrows2[rIndex++];
+			} else {
+				char* s1 = trim(e1);
+				char* s2 = trim(e2);
+				if (stringComparator(s1, s2) < 0) {
+					result[aIndex++] = arrows1[lIndex++];
+				} else {
+					result[aIndex++] = arrows2[rIndex++];
+				}
+				free(s1);
+				free(s2);
 			}
-			free(s1);
-			free(s2);
 		}
 	} else {
 		return NULL;
@@ -167,7 +191,7 @@ Row* mergeSort(Row* arrows, int length, int index, format f) {
 	}
 	int l = length / 2; // Length of left subarray
 	int r = l + length % 2; // Length of right subarray
-	mergeSort(arrows, l, index, f);
-	mergeSort(&arrows[l], r, index, f);
-	return merge(arrows, l, &arrows[l], r, index, f);
+	Row* m1 = mergeSort(arrows, l, index, f);
+	Row* m2 = mergeSort(&arrows[l], r, index, f);
+	return merge(m1, l, m2, r, index, f);
 }
