@@ -9,17 +9,11 @@
 
 int main(int argc, char ** argv) {
 
-	/*if (argc < 3) {
+	if (argc < 3) {
 		fprintf(stderr, "Invalid argument count");
 	}
 
-	// Get column titles
-
-	char** headers = GetLine();
-	printf("FIND: %s\n", argv[2]);
-	int targetCol = GetIndex(headers, argv[2]);
-	printf("%d", targetCol);*/
-
+/*
 	// Testing mergeSort
 	/*char * a[] = { "food", "calories", "fat", "sodium" };
 	header.titles = a;
@@ -63,19 +57,38 @@ int main(int argc, char ** argv) {
 	free(c);
 	free(Rows);*/
 
+	// Get column titles
+
+	char** headers = GetLine();
+	printf("FIND: %s\n", argv[2]);
+	int rowcount = FillRows();
+	printf("ROWS == %d", rowcount);
+//	printf("\n\n%s", Rows[3].entries[0]);
+//	int targetCol = GetIndex(headers, argv[2]);
+//	printf("TARGET COLUMN == %d\n", targetCol);
+
+// Testing mergeSort
+// char ** ee = { "" };
+
 	return 0;
 }
 
-// GetLine: Reads each line until the end and returns the string
+/**
+ * Reads current row and returns array of entries
+ */
 
 char** GetLine() {
+
 	// Use getLine to get current line and store in "line" variable
 	size_t length = 0;
-	char* line = (char*) malloc(length * sizeof(char));
-	getline(&line, &length, stdin);
-	//printf("%s\n", line);
+	char* line = NULL;
+	size_t r = getline(&line, &length, stdin);
+	//printf("\n[%d]LINE: %s", r,line);
+	if (r < 1) {
+		free(line);
+		return NULL;
+	}
 
-	// Tokenize based on quotes counts
 	// Create 2D array to hold each entry
 	int quotes = 0;
 	int arrsize = 1;
@@ -83,69 +96,88 @@ char** GetLine() {
 	char** entries = (char**) malloc(arrsize * sizeof(char*));
 
 	// Parse for commas and quotes
-	int i = 0;
-	int linepos = 0;
-	int linelength = strlen(line);
+	size_t i = 0;
+	size_t linepos = 0;
+	size_t linelength = strlen(line);
 
+	//printf("%d>>%s", r, line);
 	// While still entering entries
 	while (linepos < linelength) {
-
+		//if(position >= 12) return NULL;
 		// If we have more entries than array size, double array length
 		if (position >= arrsize) {
-			arrsize *= 2;
+			arrsize *= 3;
 			entries = realloc(entries, arrsize);
 		}
 
 		i = 0;
-		int entrylength = 30;
+		size_t entrylength = 30;
 		char* entry = (char*) malloc(entrylength * sizeof(char));
-
 		// While reading from the entries line
 		while (linepos < linelength) {
 
 			char c = line[linepos];
 
 			// Check for quotes
-			if(c == '"' && quotes == 0)quotes++;
-			else if(c == '"' && quotes == 1) quotes--;
+			if (c == '"' && quotes == 0)
+				quotes++;
+			else if (c == '"' && quotes == 1)
+				quotes--;
 
 			// Check for commas sans quotes
-			if((c == ',' && quotes == 0) || c == '\n')
-			{
+			if ((c == ',' && quotes == 0) || c == '\n') {
 				linepos++;
 				break;
 			}
 			entry[i] = line[linepos];
+			//printf("%s> ", entry);
 
 			i++;
 			linepos++;
 			if (i >= entrylength) {
-				entrylength *= 2;
+				entrylength *= 3;
 				entry = realloc(entry, entrylength);
 			}
 		}
+
 		printf("%s | ", entry);
 		entries[position] = entry;
 		position++;
 	}
-	printf("\n---------\n");
-	//printf("\n%s",entries[2]);
+	printf("\n");
 	return entries;
 }
 
-int GetIndex(char** source, char* target)
-{
-	if(!source || !target)
-	{
+int FillRows() {
+	int rows = 0;
+	while (1) {
+
+		char** entries = GetLine();
+		if (entries == NULL) {
+			fprintf(stderr, "End of File");
+			return rows;
+		}
+		printf("1ROW: %d >> ",rows);
+		Row* row = (Row*) malloc(sizeof(Row));
+		row->entries = entries;
+		rows++;
+		printf("2ROW: %d\n",rows);
+	}
+	printf("%d", rows);
+	return rows;
+}
+
+int GetIndex(char** source, char* target) {
+
+	if (!source || !target) {
 		fprintf(stderr, "Cannot find index of null source or null target");
 		return -1;
 	}
 
 	int i = 0;
-
-	while(source[i])
-	{
-		if (strcmp(source[i], target) == 0) return i;
+	while (source[i]) {
+		if (strcmp(source[i], target) == 0)
+			return i;
 		i++;
 	}
 

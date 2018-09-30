@@ -50,6 +50,13 @@ Row* merge(Row*, int, Row*, int, int, format);
 // Sorts an array of Rows using merge sort
 Row* mergeSort(Row*, int, int, format);
 
+// Reads current row and returns array of entries
 char** GetLine();
+
+// Get Index of a row entry
+int GetIndex(char** source, char* target);
+
+// Fills Rows with Row structs, using GetLine()
+int FillRows();
 
 #endif /* SIMPLECSVSORTER_H_ */
