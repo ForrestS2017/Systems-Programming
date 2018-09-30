@@ -2,7 +2,7 @@
  * mergesort.c
  *
  *  Created on: Sep 28, 2018
- *      Author: Justin Chan, Forest Smith
+ *      Author: Justin Chan, Forrest Smith
  */
 
 #include "simpleCSVsorter.h"
@@ -42,27 +42,50 @@ int doubleComparator(void* n1, void* n2) {
  * @param str String to parse
  * @return Formatted string
  */
-char* formatString(char* str) {
+char* trim(char* str) {
 	int length = strlen(str);
-	return 0;
-}
+	char * ret = (char*)malloc(sizeof(char) * (length + 1));
+	if (ret == NULL) {
+		printf("ERROR: malloc returned null at formatString in mergesort.c");
+		return str;
+	}
+	int j = 0;
+	char prev = '\0';
+	char firstNonSpaceChar = '\0';
+	short started = 0; // for determining whether string started or not... quotes and spaces don't count as start
+	for (int i = 0; i < length; i++) {
+		if (started == 0 && (str[i] == '"' || str[i] == ' ')) {
+			if (str[i] == '"' && firstNonSpaceChar == '\0') {
+				firstNonSpaceChar = '"';
+			}
+			continue;
+		}
+		if (str[i] == '"' && i == length - 1 && firstNonSpaceChar == '"') {
+			break;
+		}
+		if (str[i] == ' ') {
+			prev = ' ';
+			continue;
+		}
+		if (str[i] == '\n' || str[i] == '\t' || str[i] == '\r' || str[i] == '\f' || str[i] == '\v' || str[i] == ' ') { // the space is different from a normal space
+			continue;
+		}
 
-/**
- * Reads an int from a string
- * @param str String to parse
- * @return Integer value of string
- */
-int parseInt(char* str) {
-	return 0;
-}
+		if (prev == ' ') {
+			ret[j] = ' ';
+			j++;
+		}
 
-/**
- * Reads a double from a string
- * @param str String to parse
- * @return Double value of string
- */
-double parseDouble(char* str) {
-	return 0;
+		if (started == 0) {
+			started = 1;
+		}
+
+		ret[j] = str[i];
+		j++;
+		prev = str[i];
+	}
+	ret[j] = '\0';
+	return ret;
 }
 
 /**
@@ -84,7 +107,9 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 
 	if (f == INTEGER) {
 		while (lIndex < length1 && rIndex < length2) {
-			if (intComparator(parseInt(arrows1[lIndex].entries[index]), parseInt(arrows2[rIndex].entries[index])) < 0) {
+			int n1 = atoi(arrows1[lIndex].entries[index]);
+			int n2 = atoi(arrows2[rIndex].entries[index]);
+			if (intComparator(&n1, &n2) < 0) {
 				result[aIndex++] = arrows1[lIndex++];
 			} else {
 				result[aIndex++] = arrows2[rIndex++];
@@ -92,7 +117,9 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 		}
 	} else if (f == DOUBLE) {
 		while (lIndex < length1 && rIndex < length2) {
-			if (doubleComparator(parseDouble(arrows1[lIndex].entries[index]), parseDouble(arrows2[rIndex].entries[index])) < 0) {
+			double d1 = atof(arrows1[lIndex].entries[index]);
+			double d2 = atof(arrows2[rIndex].entries[index]);
+			if (doubleComparator(&d1, &d2) < 0) {
 				result[aIndex++] = arrows1[lIndex++];
 			} else {
 				result[aIndex++] = arrows2[rIndex++];
@@ -100,8 +127,8 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 		}
 	} else if (f == STRING) {
 		while (lIndex < length1 && rIndex < length2) {
-			char* s1 = formatString(arrows1[lIndex].entries[index]);
-			char* s2 = formatString(arrows2[rIndex].entries[index]);
+			char* s1 = trim(arrows1[lIndex].entries[index]);
+			char* s2 = trim(arrows2[rIndex].entries[index]);
 			if (stringComparator(s1, s2) < 0) {
 				result[aIndex++] = arrows1[lIndex++];
 			} else {

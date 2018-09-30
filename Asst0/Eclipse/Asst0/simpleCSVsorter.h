@@ -42,13 +42,7 @@ int intComparator(void*, void*);
 int doubleComparator(void*, void*);
 
 // Trims white space and removes quotation marks from a string
-char* formatString(char*);
-
-// Reads an int from a string
-int parseInt(char*);
-
-// Reads a double from a string
-double parseDouble(char*);
+char* trim(char*);
 
 // Merges two arrays of rows. Used for merge sort
 Row* merge(Row*, int, Row*, int, int, format);

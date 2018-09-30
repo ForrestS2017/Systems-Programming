@@ -9,7 +9,7 @@
 
 int main(int argc, char ** argv) {
 
-	if (argc < 3) {
+	/*if (argc < 3) {
 		fprintf(stderr, "Invalid argument count");
 	}
 
@@ -18,7 +18,7 @@ int main(int argc, char ** argv) {
 	char** headers = GetLine();
 	printf("FIND: %s\n", argv[2]);
 	int targetCol = GetIndex(headers, argv[2]);
-	printf("%d", targetCol);
+	printf("%d", targetCol);*/
 
 	// Testing mergeSort
 	//char ** ee = { "" };
