@@ -64,7 +64,7 @@ int main(int argc, char ** argv) {
 	printf("FIND: %s\n", argv[2]);
 	int rowcount = FillRows();
 	printf("\nROWCOUNT == %d", rowcount);
-	printf("\n\nSTRUCTTEST:%s", Rows[0]->entries[0]);
+	printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
@@ -83,11 +83,11 @@ char** GetLine() {
 	// Use getLine to get current line and store in "line" variable
 	size_t length = 0;
 	char* line = NULL;
-	printf("hello\n");
+	//printf("hello\n");
 	size_t r = getline(&line, &length, stdin);
-	printf("hello 2\n");
+	//printf("hello 2\n");
 	if (feof(stdin)) {
-		printf("hello feof\n");
+		printf("**EOF**\n");
 		//free(line);
 		return NULL;
 	}
@@ -110,8 +110,8 @@ char** GetLine() {
 		//if(position >= 12) return NULL;
 		// If we have more entries than array size, double array length
 		if (position >= arrsize) {
-			printf("123129837928173987 %s | ", entries[0]);
-			arrsize *= 3;
+			//printf("123129837928173987 %s | ", entries[0]);
+			arrsize *= 2;
 			entries = realloc(entries, sizeof(char *) * arrsize);
 		}
 
@@ -140,21 +140,21 @@ char** GetLine() {
 			i++;
 			linepos++;
 			if (i >= entrylength) {
-				entrylength *= 3;
-				entry = realloc(entry, entrylength);
+				entrylength *= 2;
+				entry = realloc(entry, sizeof(char) * entrylength);
 			}
 		}
-if (position > 0) {
-		printf("right before %s | ", entries[0]);
-		printf("%d\n", position);
-		printf("ENTRY: %s\n", entry);
-		printf("array size: %d\n", arrsize);
-		printf("address of entries[0]: %p", entries[0]);
-		printf("address of entries[position]: %p", entries[position]);
-}
+//if (position > 0) {
+//		printf("right before %s | ", entries[0]);
+//		printf("%d\n", position);
+//		printf("ENTRY: %s\n", entry);
+//		printf("array size: %d\n", arrsize);
+//		printf("address of entries[0]: %p", entries[0]);
+//		printf("address of entries[position]: %p", entries[position]);
+//}
 		entries[position] = entry;
-		printf("Address of entries[0]: %p", entries[0]);
-		printf("ENTRIES 0: %s\n", entries[0]);
+//		printf("Address of entries[0]: %p", entries[0]);
+//		printf("ENTRIES 0: %s\n", entries[0]);
 		printf("(%d)%s | ", position, entries[position]);
 		printf("%s\n", entries[0]);
 		position++;
@@ -167,28 +167,26 @@ if (position > 0) {
 int FillRows() {
 	int rows = 0;
 	int capacity = 1;
-	Rows = (Row**)malloc(capacity*sizeof(Row*));
+	Rows = (Row*)malloc(capacity * sizeof(Row));
 
 	while (1) {
 		printf("hi\n");
 		char** entries = GetLine();
 		if (entries == NULL) {
-			fprintf(stdout, "\nEOF");
+			fprintf(stdout, "\nEOF FILLROWS\n");
 			printf("END FILLROWS 1");
 			printf("\nFILLROWS: %d", rows);
 			return rows;
 		}
 		printf("ENTRY: %s\n", entries[0]);
-		Row* row = (Row*) malloc(sizeof(Row));
-		row->entries = entries;
-		Rows[rows] = row;
+		Rows[rows].entries = entries;
 		printf("STRUCT: %s\n", entries[2]);
 		rows++;
 		printf("ROW: %d\n", rows);
 
 		if( rows >= capacity) {
 			capacity *= 2;
-			Rows = realloc(Rows, capacity);
+			Rows = realloc(Rows, capacity * sizeof(Row));
 		}
 	}
 	printf("END FILLROWS 2");

@@ -28,7 +28,7 @@ typedef struct _Row {
 } Row;
 
 Header header;
-Row** Rows;
+Row* Rows;
 
 /***** Functions *****/
 
