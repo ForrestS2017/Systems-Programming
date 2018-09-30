@@ -30,16 +30,13 @@ typedef struct _Row {
 Header header;
 Row* Rows;
 
+/***** Functions *****/
+
 int stringComparator(void*, void*);
 
 int intComparator(void*, void*);
 
 char* mergeSort(Row * row, int i, format f);
-
-Header Head;
-Row* Rows;
-
-/***** Functions *****/
 
 char* GetLine();
 

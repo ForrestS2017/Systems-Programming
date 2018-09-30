@@ -28,12 +28,13 @@ int intComparator(void* n1, void* n2) {
 }
 
 /**
- * Sorts an array/linked list whatever using mergesort
+ * Sorts an array/linked list whatever using merge sort
+ * @param rows
  * @param s Array/linkedlist whatever to be sorted
  * @param f Format enum indicating whether value to be sorted is an integer or a string
  * @return Sorted array/linked list
  */
-char* mergeSort(Row * row, int i, format f) {
+char* mergeSort(Row * rows, int index, format f) {
 	char * b = "a";
 	return b;
 }
