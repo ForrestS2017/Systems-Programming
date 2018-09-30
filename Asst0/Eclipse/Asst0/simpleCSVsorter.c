@@ -13,7 +13,6 @@ int main(int argc, char ** argv) {
 		fprintf(stderr, "Invalid argument count");
 	}
 
-/*
 	// Testing mergeSort
 	/*char * a[] = { "food", "calories", "fat", "sodium" };
 	header.titles = a;
@@ -66,9 +65,6 @@ int main(int argc, char ** argv) {
 //	printf("\n\n%s", Rows[3].entries[0]);
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
-
-// Testing mergeSort
-// char ** ee = { "" };
 
 	return 0;
 }
