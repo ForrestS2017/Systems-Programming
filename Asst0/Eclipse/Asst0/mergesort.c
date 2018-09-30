@@ -50,10 +50,11 @@ char* trim(char* str) {
 		return str;
 	}
 	int j = 0;
+	int i = 0;
 	char prev = '\0';
 	char firstNonSpaceChar = '\0';
 	short started = 0; // for determining whether string started or not... quotes and spaces don't count as start
-	for (int i = 0; i < length; i++) {
+	for (i = 0; i < length; i++) {
 		if (started == 0 && (str[i] == '"' || str[i] == ' ')) {
 			if (str[i] == '"' && firstNonSpaceChar == '\0') {
 				firstNonSpaceChar = '"';
