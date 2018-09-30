@@ -38,6 +38,6 @@ int intComparator(void*, void*);
 
 char* mergeSort(Row * row, int i, format f);
 
-char* GetLine();
+char** GetLine();
 
 #endif /* SIMPLECSVSORTER_H_ */

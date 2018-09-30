@@ -38,32 +38,3 @@ char* mergeSort(Row * rows, int index, format f) {
 	char * b = "a";
 	return b;
 }
-
-// GetLine: Reads each line until the end and returns the string
-
-char* GetLine()
-{
-	size_t length = 50;
-	//size_t position = 0;
-	char* line = (char*) malloc(length * sizeof(char));
-	//char character;
-
-/*	while (read(0, &character, 1) != 0 && character != '\n')
-	{
-		line[position] = character;
-		position++;
-		if (position == length) {
-			length *= 2;
-			line = realloc(line, length * sizeof(char));
-		}
-	}
-
-	if (position == 0)
-	{
-		return NULL;
-	}
-	*/
-
-	getline(&line, &length, stdin);
-	return line;
-}
