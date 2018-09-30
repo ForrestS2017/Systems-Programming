@@ -68,7 +68,7 @@ char* trim(char* str) {
 			prev = ' ';
 			continue;
 		}
-		if (str[i] == '\n' || str[i] == '\t' || str[i] == '\r' || str[i] == '\f' || str[i] == '\v' || str[i] == ' ') { // the space is different from a normal space
+		if (str[i] == '\n' || str[i] == '\t' || str[i] == '\r' || str[i] == '\f' || str[i] == '\v') {
 			continue;
 		}
 
