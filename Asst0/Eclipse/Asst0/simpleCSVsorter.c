@@ -20,4 +20,9 @@ int main(int argc, char ** argv) {
 
 	columns = GetLine();
 	printf("%s", columns);
+
+	// Testing mergeSort
+	//char ** ee = { "" };
+
+	return 0;
 }
