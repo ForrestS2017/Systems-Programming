@@ -30,7 +30,7 @@ int SetHeader(Header h) {
 		if (position >= arrsize) {
 			arrsize *= 2;
 			//h.titles = realloc(h.titles, sizeof(char*) * arrsize);
-			char** tmp = malloc(sizeof(char*) * arrsize);
+			char** tmp = malloc(sizeof(char*) * (arrsize + 1));
 			memcpy(tmp, h.titles, arrsize / 2);
 			//free(h.titles);
 			h.titles = tmp;
@@ -250,7 +250,7 @@ int main(int argc, char ** argv) {
 
 	// Get column titles
 	Header header = { NULL, NULL };
-	header.titles = (char**) malloc(sizeof(char*));
+	header.titles = (char**) malloc(sizeof(char*) * 10);
 
 	int i = 0;
 	int c = SetHeader(header); // Number of columns in table
