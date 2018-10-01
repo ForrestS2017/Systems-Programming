@@ -32,7 +32,7 @@ int SetHeader(Header h) {
 			//h.titles = realloc(h.titles, sizeof(char*) * arrsize);
 			char** tmp = malloc(sizeof(char*) * arrsize);
 			memcpy(tmp, h.titles, arrsize / 2);
-			free(h.titles);
+			//free(h.titles);
 			h.titles = tmp;
 		}
 
