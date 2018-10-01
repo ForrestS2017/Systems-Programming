@@ -267,9 +267,9 @@ int main(int argc, char ** argv) {
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
-	printf("%s\n", header.titles[3]);
-	/*for (i = 0; i < c; i++) {
-		printf("colname: %p %s, header.titles[%d]: %p, %s", colname, colname, i, header.titles[i], header.titles[i]);
+	//printf("%s\n", header.titles[3]);
+	for (i = 0; i < c; i++) {
+		//printf("colname: %p %s, header.titles[%d]: %p, %s", colname, colname, i, header.titles[i], header.titles[i]);
 		if (strcmp(colname, header.titles[i]) == 0) {
 			index = i;
 			break;
@@ -312,6 +312,6 @@ int main(int argc, char ** argv) {
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
-	printf("\n");*/
+	printf("\n");
 	return 0;
 }
