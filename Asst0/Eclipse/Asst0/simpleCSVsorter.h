@@ -27,8 +27,6 @@ typedef struct _Row {
 	char** entries;			// Hold each entry of the row. The type of each corresponds to format enum
 } Row;
 
-Row* Rows;
-
 /***** Functions *****/
 
 // Compares two strings
