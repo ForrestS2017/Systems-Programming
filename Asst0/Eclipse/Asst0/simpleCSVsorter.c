@@ -30,10 +30,6 @@ int SetHeader(Header* h) {
 		if (position >= arrsize) {
 			arrsize *= 2;
 			h->titles = realloc(h->titles, sizeof(char*) * (arrsize + 1));
-			//char** tmp = malloc(sizeof(char*) * (arrsize + 10));
-			//memcpy(tmp, h.titles, arrsize / 2);
-			//free(h.titles);
-			//h.titles = tmp;
 		}
 
 		i = 0;
@@ -196,7 +192,7 @@ int FillRows(Row** Rows, Header* header, int columns) {
 			return rows;
 		}
 		//printf("ENTRY: %s\n", entries[0]);
-		Rows[rows]->entries = entries;
+		(*Rows)[rows]->entries = entries;
 		for (w = 0; w < columns; w++) {
 			format t = getType(entries[w]);
 			if (t > header->types[w]) {
@@ -209,9 +205,9 @@ int FillRows(Row** Rows, Header* header, int columns) {
 
 		if (rows >= capacity) {
 			capacity *= 2;
-			Rows = realloc(Rows, capacity * sizeof(Row));
+			(*Rows) = realloc(*Rows, capacity * sizeof(Row));
 			for (w = capacity / 2 + 2; w < capacity; w++) {
-				Rows[w]->entries = NULL;
+				(*Rows)[w]->entries = NULL;
 			}
 		}
 	}
