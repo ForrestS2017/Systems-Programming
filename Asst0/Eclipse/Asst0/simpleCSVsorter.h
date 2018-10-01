@@ -16,7 +16,7 @@
 
 /***** Variables, Structs, Prototypes *****/
 
-typedef enum _format{ STRING, INTEGER, DOUBLE } format;
+typedef enum _format{ INTEGER=1, DOUBLE=2, STRING=3 } format;
 
 typedef struct _Header {		// Only for first row data
 	char** titles;			// Hold the titles of each column
@@ -27,7 +27,6 @@ typedef struct _Row {
 	char** entries;			// Hold each entry of the row. The type of each corresponds to format enum
 } Row;
 
-Header header;
 Row* Rows;
 
 /***** Functions *****/
