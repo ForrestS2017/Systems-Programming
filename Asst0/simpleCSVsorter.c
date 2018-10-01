@@ -53,6 +53,12 @@ int SetHeader(Header* h) {
 				linepos++;
 				break;
 			}
+
+			if (c == '\r') {
+				linepos++;
+				continue;
+			}
+
 			entry[i] = line[linepos];
 
 			i++;
@@ -267,9 +273,8 @@ int main(int argc, char ** argv) {
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
-	//printf("%s\n", header.titles[3]);
 	for (i = 0; i < c; i++) {
-		//printf("colname: %p %s, header.titles[%d]: %p, %s", colname, colname, i, header.titles[i], header.titles[i]);
+		printf("colname: |%s|, header.titles[%d]: |%s|\n", colname, i, header.titles[i]);
 		if (strcmp(colname, header.titles[i]) == 0) {
 			index = i;
 			break;
@@ -277,7 +282,7 @@ int main(int argc, char ** argv) {
 	}
 
 	if (index == -1) {
-		printf("u dun goofd");
+		printf("u dun goofd\n");
 		return 0;
 	}
 
@@ -288,7 +293,7 @@ int main(int argc, char ** argv) {
 	//printf("\nROWCOUNT == %d", rowcount);
 	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
 
-	int p = 0;
+	/*int p = 0;
 	for (p = 0; p < c; p++) {
 		printf("%s", header.titles[p]); // print out the top row
 		if (p != c - 1) {
@@ -312,6 +317,6 @@ int main(int argc, char ** argv) {
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
-	printf("\n");
+	printf("\n");*/
 	return 0;
 }
