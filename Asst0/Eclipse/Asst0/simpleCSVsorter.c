@@ -177,7 +177,7 @@ format getType(char* str) {
 	return ret;
 }
 
-int FillRows(Row** Rows, Header* header, int columns) {
+int FillRows(Row* Rows, Header* header, int columns) {
 	int rows = 0;
 	int capacity = 1;
 	int w = 0;
@@ -192,7 +192,7 @@ int FillRows(Row** Rows, Header* header, int columns) {
 			return rows;
 		}
 		//printf("ENTRY: %s\n", entries[0]);
-		(*Rows)[rows]->entries = entries;
+		Rows[rows]->entries = entries;
 		for (w = 0; w < columns; w++) {
 			format t = getType(entries[w]);
 			if (t > header->types[w]) {
@@ -205,9 +205,9 @@ int FillRows(Row** Rows, Header* header, int columns) {
 
 		if (rows >= capacity) {
 			capacity *= 2;
-			(*Rows) = realloc(*Rows, capacity * sizeof(Row));
+			Rows = realloc(Rows, capacity * sizeof(Row));
 			for (w = capacity / 2 + 2; w < capacity; w++) {
-				(*Rows)[w]->entries = NULL;
+				Rows[w]->entries = NULL;
 			}
 		}
 	}
@@ -263,7 +263,7 @@ int main(int argc, char ** argv) {
 	Row* rows = (Row*)malloc(sizeof(Row));
 	rows[0].entries = NULL;
 
-	int rowcount = FillRows(&rows, &header, c);
+	int rowcount = FillRows(rows, &header, c);
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
