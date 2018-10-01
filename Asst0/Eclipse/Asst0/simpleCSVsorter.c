@@ -53,6 +53,12 @@ int SetHeader(Header* h) {
 				linepos++;
 				break;
 			}
+
+			if (c == '\r') {
+				linepos++;
+				continue;
+			}
+
 			entry[i] = line[linepos];
 
 			i++;
@@ -177,7 +183,7 @@ format getType(char* str) {
 	return ret;
 }
 
-int FillRows(Row* Rows, Header* header, int columns) {
+int FillRows(Row** Rows, Header* header, int columns) {
 	int rows = 0;
 	int capacity = 1;
 	int w = 0;
@@ -192,7 +198,7 @@ int FillRows(Row* Rows, Header* header, int columns) {
 			return rows;
 		}
 		//printf("ENTRY: %s\n", entries[0]);
-		Rows[rows].entries = entries;
+		(*Rows)[rows].entries = entries;
 		for (w = 0; w < columns; w++) {
 			format t = getType(entries[w]);
 			if (t > header->types[w]) {
@@ -205,9 +211,9 @@ int FillRows(Row* Rows, Header* header, int columns) {
 
 		if (rows >= capacity) {
 			capacity *= 2;
-			Rows = realloc(Rows, capacity * sizeof(Row));
+			(*Rows) = realloc((*Rows), capacity * sizeof(Row));
 			for (w = capacity / 2 + 2; w < capacity; w++) {
-				Rows[w].entries = NULL;
+				(*Rows)[w].entries = NULL;
 			}
 		}
 	}
@@ -263,13 +269,12 @@ int main(int argc, char ** argv) {
 	Row* rows = (Row*)malloc(sizeof(Row));
 	rows[0].entries = NULL;
 
-	int rowcount = FillRows(rows, &header, c);
+	int rowcount = FillRows(&rows, &header, c);
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
-	//printf("%s\n", header.titles[3]);
 	for (i = 0; i < c; i++) {
-		//printf("colname: %p %s, header.titles[%d]: %p, %s", colname, colname, i, header.titles[i], header.titles[i]);
+		printf("colname: |%s|, header.titles[%d]: |%s|\n", colname, i, header.titles[i]);
 		if (strcmp(colname, header.titles[i]) == 0) {
 			index = i;
 			break;
@@ -277,7 +282,7 @@ int main(int argc, char ** argv) {
 	}
 
 	if (index == -1) {
-		printf("u dun goofd");
+		printf("u dun goofd\n");
 		return 0;
 	}
 
@@ -288,7 +293,7 @@ int main(int argc, char ** argv) {
 	//printf("\nROWCOUNT == %d", rowcount);
 	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
 
-	int p = 0;
+	/*int p = 0;
 	for (p = 0; p < c; p++) {
 		printf("%s", header.titles[p]); // print out the top row
 		if (p != c - 1) {
@@ -312,6 +317,6 @@ int main(int argc, char ** argv) {
 //	int targetCol = GetIndex(headers, argv[2]);
 //	printf("TARGET COLUMN == %d\n", targetCol);
 
-	printf("\n");
+	printf("\n");*/
 	return 0;
 }
