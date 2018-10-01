@@ -272,6 +272,7 @@ int main(int argc, char ** argv) {
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
 	for (i = 0; i < c; i++) {
+		printf("colname: %d %s, header.titles[%d]: %d, %s", colname, colname, i, header.titles, header.titles);
 		if (strcmp(colname, header.titles[i]) == 0) {
 			index = i;
 			break;
