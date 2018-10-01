@@ -8,7 +8,7 @@
 #include "simpleCSVsorter.h"
 
 
-int SetHeader(Header h) {
+int SetHeader(Header* h) {
 
 	size_t length = 0;
 	char* line = NULL;
@@ -29,11 +29,11 @@ int SetHeader(Header h) {
 
 		if (position >= arrsize) {
 			arrsize *= 2;
-			//h.titles = realloc(h.titles, sizeof(char*) * (arrsize + 1));
-			char** tmp = malloc(sizeof(char*) * (arrsize + 10));
-			memcpy(tmp, h.titles, arrsize / 2);
+			h->titles = realloc(h->titles, sizeof(char*) * (arrsize + 1));
+			//char** tmp = malloc(sizeof(char*) * (arrsize + 10));
+			//memcpy(tmp, h.titles, arrsize / 2);
 			//free(h.titles);
-			h.titles = tmp;
+			//h.titles = tmp;
 		}
 
 		i = 0;
@@ -69,7 +69,7 @@ int SetHeader(Header h) {
 				}
 			}
 		}
-		h.titles[position] = entry;
+		h->titles[position] = entry;
 		position++;
 	}
 
@@ -181,7 +181,7 @@ format getType(char* str) {
 	return ret;
 }
 
-int FillRows(Row* Rows, Header header, int columns) {
+int FillRows(Row** Rows, Header* header, int columns) {
 	int rows = 0;
 	int capacity = 1;
 	int w = 0;
@@ -196,11 +196,11 @@ int FillRows(Row* Rows, Header header, int columns) {
 			return rows;
 		}
 		//printf("ENTRY: %s\n", entries[0]);
-		Rows[rows].entries = entries;
+		Rows[rows]->entries = entries;
 		for (w = 0; w < columns; w++) {
 			format t = getType(entries[w]);
-			if (t > header.types[w]) {
-				header.types[w] = t;
+			if (t > header->types[w]) {
+				header->types[w] = t;
 			}
 		}
 		//printf("STRUCT: %s\n", entries[2]);
@@ -211,7 +211,7 @@ int FillRows(Row* Rows, Header header, int columns) {
 			capacity *= 2;
 			Rows = realloc(Rows, capacity * sizeof(Row));
 			for (w = capacity / 2 + 2; w < capacity; w++) {
-				Rows[w].entries = NULL;
+				Rows[w]->entries = NULL;
 			}
 		}
 	}
@@ -253,7 +253,7 @@ int main(int argc, char ** argv) {
 	header.titles = (char**) malloc(sizeof(char*) * 10);
 
 	int i = 0;
-	int c = SetHeader(header); // Number of columns in table
+	int c = SetHeader(&header); // Number of columns in table
 	if (c == -1) {
 		// error
 		return -1;
@@ -267,7 +267,7 @@ int main(int argc, char ** argv) {
 	Row* rows = (Row*)malloc(sizeof(Row));
 	rows[0].entries = NULL;
 
-	int rowcount = FillRows(rows, header, c);
+	int rowcount = FillRows(&rows, &header, c);
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
