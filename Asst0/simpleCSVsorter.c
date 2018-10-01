@@ -29,7 +29,11 @@ int SetHeader(Header h) {
 
 		if (position >= arrsize) {
 			arrsize *= 2;
-			h.titles = realloc(h.titles, sizeof(char*) * (arrsize + 1));
+			//h.titles = realloc(h.titles, sizeof(char*) * (arrsize + 1));
+			char** tmp = malloc(sizeof(char*) * (arrsize + 10));
+			memcpy(tmp, h.titles, arrsize / 2);
+			//free(h.titles);
+			h.titles = tmp;
 		}
 
 		i = 0;
