@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #ifndef SIMPLECSVSORTER_H_
 #define SIMPLECSVSORTER_H_
