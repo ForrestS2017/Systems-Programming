@@ -30,10 +30,6 @@ int SetHeader(Header* h) {
 		if (position >= arrsize) {
 			arrsize *= 2;
 			h->titles = realloc(h->titles, sizeof(char*) * (arrsize + 1));
-			//char** tmp = malloc(sizeof(char*) * (arrsize + 10));
-			//memcpy(tmp, h.titles, arrsize / 2);
-			//free(h.titles);
-			//h.titles = tmp;
 		}
 
 		i = 0;
@@ -181,7 +177,7 @@ format getType(char* str) {
 	return ret;
 }
 
-int FillRows(Row** Rows, Header* header, int columns) {
+int FillRows(Row* Rows, Header* header, int columns) {
 	int rows = 0;
 	int capacity = 1;
 	int w = 0;
@@ -267,7 +263,7 @@ int main(int argc, char ** argv) {
 	Row* rows = (Row*)malloc(sizeof(Row));
 	rows[0].entries = NULL;
 
-	int rowcount = FillRows(&rows, &header, c);
+	int rowcount = FillRows(rows, &header, c);
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
