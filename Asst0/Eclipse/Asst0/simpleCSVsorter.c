@@ -29,7 +29,7 @@ int SetHeader(Header h) {
 
 		if (position >= arrsize) {
 			arrsize *= 2;
-			h.titles = realloc(h.titles, sizeof(char*) * arrsize);
+			h.titles = realloc(h.titles, sizeof(char*) * (arrsize + 1));
 		}
 
 		i = 0;
