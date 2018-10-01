@@ -1,5 +1,4 @@
 /*
- *
  * simpleCSVsorter.c
  *
  *  Created on: Sep 20, 2018
@@ -8,80 +7,71 @@
 
 #include "simpleCSVsorter.h"
 
-int main(int argc, char ** argv) {
 
-	if (argc < 3) {
-		fprintf(stderr, "Invalid argument count");
+int SetHeader(Header h) {
+
+	size_t length = 0;
+	char* line = NULL;
+	getline(&line, &length, stdin);
+	if (feof(stdin)) {
+		return -1;
 	}
 
-	// Testing mergeSort
-	/*char * a[] = { "food", "calories", "fat", "sodium" };
-	header.titles = a;
-	format b[] = { STRING, INTEGER, INTEGER, DOUBLE };
-	header.types = b;
-	Rows = malloc(sizeof(Row) * 10);
-	char *** c = malloc(sizeof(char**) * 10);
-	char* c0[] = { "pizza", "201", "17", "-9.8" };
-	c[0] = c0;
-	char* c1[] = { "soup", "200", "12", "9.8" };
-	c[1] = c1;
-	char* c2[] = { "pie", "500", "25", "4.5" };
-	c[2] = c2;
-	char* c3[] = { "celery", "-10", "0", "-0.9" };
-	c[3] = c3;
-	char* c4[] = { "chicken", "10", "8", "0.9" };
-	c[4] = c4;
-	char* c5[] = { "ice cream", "", "4", "10.9" };
-	c[5] = c5;
-	char* c6[] = { "", "20", "18", "4.5" };
-	c[6] = c6;
-	char* c7[] = { "banana", "87", "55", "" };
-	c[7] = c7;
-	char* c8[] = { "kiwi", "91", "46", "108.9" };
-	c[8] = c8;
-	char* c9[] = { "lemon", "64", "-90", "" };
-	c[9] = c9;
-	for (int i = 0; i < 10; i++) {
-		Rows[i].entries = c[i];
-	}
+	int quotes = 0;
+	int arrsize = 1;
+	int position = 0;
 
-	Row* tmp = mergeSort(Rows, 10, 0, STRING);
-	//Row* tmp = mergeSort(Rows, 10, 1, INTEGER);
-	//Row* tmp = mergeSort(Rows, 10, 2, INTEGER);
-	//Row* tmp = mergeSort(Rows, 10, 3, DOUBLE);
-	free(Rows);
-	Rows = tmp;
-	for (int j = 0; j < 10; j++) {
-		printf("%s,%s,%s,%s\n", Rows[j].entries[0], Rows[j].entries[1], Rows[j].entries[2], Rows[j].entries[3]);
-	}
-	free(c);
-	free(Rows);*/
+	h.titles = (char**) malloc(arrsize * sizeof(char*));
 
-	// Check for weird space
-	//printf("|%s|", trim("\"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe�\""));
+	size_t i = 0;
+	size_t linepos = 0;
+	size_t linelength = strlen(line);
 
-	// Get column titles
-	//char** headers = GetLine();
-	//printf("FIND: %s\n", argv[2]);
-	int rowcount = FillRows();
-	//printf("\nROWCOUNT == %d", rowcount);
-	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
-	int p = 0;
-	int o = 0;
+	while (linepos < linelength) {
 
-	for( o = 0; o < rowcount; o++){
-		printf("%d) ",o);
-		for(p = 0; p < 12; p++){
-			printf("%s | ", Rows[o].entries[p]);
+		if (position >= arrsize) {
+			arrsize *= 2;
+			h.titles = realloc(h.titles, sizeof(char*) * arrsize);
 		}
-		printf("\n");
+
+		i = 0;
+		size_t entrylength = 30;
+		char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
+
+		int a = 0;
+		for (a = 0; a < entrylength; a++) {
+			entry[a] = '\0';
+		}
+
+		while (linepos < linelength) {
+			char c = line[linepos];
+
+			if (c == '"' && quotes == 0)
+				quotes++;
+			else if (c == '"' && quotes == 1)
+				quotes--;
+
+			if ((c == ',' && quotes == 0) || c == '\n') {
+				linepos++;
+				break;
+			}
+			entry[i] = line[linepos];
+
+			i++;
+			linepos++;
+			if (i >= entrylength) {
+				entrylength *= 2;
+				entry = realloc(entry, sizeof(char) * (entrylength + 1));
+				for (a = entrylength / 2 + 2; a < entrylength; a++) {
+					entry[a] = '\0';
+				}
+			}
+		}
+		h.titles[position] = entry;
+		position++;
 	}
 
-//	int targetCol = GetIndex(headers, argv[2]);
-//	printf("TARGET COLUMN == %d\n", targetCol);
-
-	printf("\n");
-	return 0;
+	return position;
 }
 
 /**
@@ -91,9 +81,9 @@ int main(int argc, char ** argv) {
 char** GetLine() {
 
 	// Use getLine to get current line and store in "line" variable
-	//size_t length = 0;
+	size_t length = 0;
 	char* line = NULL;
-	//size_t r = getline(&line, &length, stdin);
+	/*size_t r = */getline(&line, &length, stdin);
 	if (feof(stdin)) {
 		//printf("**EOF**\n");
 		//free(line);
@@ -123,7 +113,7 @@ char** GetLine() {
 
 		i = 0;
 		size_t entrylength = 30;
-		char* entry = (char*) malloc(entrylength * sizeof(char));
+		char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
 
 		int a = 0;
 		for (a = 0; a < entrylength; a++) {
@@ -151,7 +141,7 @@ char** GetLine() {
 			linepos++;
 			if (i >= entrylength) {
 				entrylength *= 2;
-				entry = realloc(entry, sizeof(char) * entrylength);
+				entry = realloc(entry, sizeof(char) * (entrylength + 1));
 				for (a = entrylength / 2 + 2; a < entrylength; a++) {
 					entry[a] = '\0';
 				}
@@ -168,14 +158,31 @@ char** GetLine() {
 	return entries;
 }
 
-int FillRows() {
+format getType(char* str) {
+	int i = 0;
+	int n = strlen(str);
+	format ret = INTEGER;
+	int periods = 0;
+	for (i = 0; i < n; i++) {
+		if (i == 0 && str[i] == '-') {
+			continue;
+		} else if (!isdigit(str[i])) {
+			if (str[i] == '.' && periods == 0) {
+				ret = DOUBLE;
+				periods++;
+			} else {
+				ret = STRING;
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
+int FillRows(Row* Rows, Header header, int columns) {
 	int rows = 0;
 	int capacity = 1;
 	int w = 0;
-	Rows = (Row*)malloc(capacity * sizeof(Row));
-	for (w = 0; w < capacity; w++) {
-		Rows[w].entries = NULL;
-	}
 
 	while (1) {
 		//printf("hi\n");
@@ -188,6 +195,12 @@ int FillRows() {
 		}
 		//printf("ENTRY: %s\n", entries[0]);
 		Rows[rows].entries = entries;
+		for (w = 0; w < columns; w++) {
+			format t = getType(entries[w]);
+			if (t > header.types[w]) {
+				header.types[w] = t;
+			}
+		}
 		//printf("STRUCT: %s\n", entries[2]);
 		rows++;
 		//printf("ROW: %d\n", rows);
@@ -219,4 +232,85 @@ int GetIndex(char** source, char* target) {
 	}
 
 	return -1;
+}
+
+int main(int argc, char ** argv) {
+
+	if (argc != 3) {
+		fprintf(stderr, "Invalid argument count");
+		return 0;
+	}
+
+	if (strcmp(argv[1], "-c") != 0) {
+		printf("u dumb");
+		return 0;
+	}
+
+	// Get column titles
+	Header header = { NULL, NULL };
+
+	int i = 0;
+	int c = SetHeader(header); // Number of columns in table
+	if (c == -1) {
+		// error
+		return -1;
+	}
+	header.types = (format*)malloc(sizeof(format) * c);
+	for (i = 0; i < c; i++) {
+		header.types[i] = INTEGER;
+	}
+
+	//printf("FIND: %s\n", argv[2]);
+	Row* rows = (Row*)malloc(sizeof(Row));
+	rows[0].entries = NULL;
+
+	int rowcount = FillRows(rows, header, c);
+
+	int index = -1; // index of column to sort on
+	char* colname = argv[2];
+	for (i = 0; i < c; i++) {
+		if (strcmp(colname, header.titles[i]) == 0) {
+			index = i;
+			break;
+		}
+	}
+
+	if (index == -1) {
+		printf("u dun goofd");
+		return 0;
+	}
+
+	Row* out = mergeSort(rows, rowcount, index, header.types[index]);
+
+	free(rows);
+
+	//printf("\nROWCOUNT == %d", rowcount);
+	//printf("\n\nSTRUCTTEST:%s", Rows[3].entries[2]);
+
+	int p = 0;
+	for (p = 0; p < c; p++) {
+		printf("%s", header.titles[p]); // print out the top row
+		if (p != c - 1) {
+			printf(",");
+		}
+	}
+	printf("\n");
+
+	for (i = 0; i < rowcount; i++) {
+		for (p = 0; p < c; p++){
+			printf("%s", out[i].entries[p]);
+			if (p != c - 1) {
+				printf(",");
+			}
+		}
+		printf("\n");
+	}
+
+	free(out);
+
+//	int targetCol = GetIndex(headers, argv[2]);
+//	printf("TARGET COLUMN == %d\n", targetCol);
+
+	printf("\n");
+	return 0;
 }
