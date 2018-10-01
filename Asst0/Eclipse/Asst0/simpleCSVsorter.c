@@ -29,11 +29,7 @@ int SetHeader(Header h) {
 
 		if (position >= arrsize) {
 			arrsize *= 2;
-			//h.titles = realloc(h.titles, sizeof(char*) * arrsize);
-			char** tmp = malloc(sizeof(char*) * (arrsize + 1));
-			memcpy(tmp, h.titles, arrsize / 2);
-			//free(h.titles);
-			h.titles = tmp;
+			h.titles = realloc(h.titles, sizeof(char*) * arrsize);
 		}
 
 		i = 0;
@@ -271,7 +267,7 @@ int main(int argc, char ** argv) {
 
 	int index = -1; // index of column to sort on
 	char* colname = argv[2];
-	printf("%s\n", header.titles[0]);
+	printf("%s\n", header.titles[3]);
 	/*for (i = 0; i < c; i++) {
 		printf("colname: %p %s, header.titles[%d]: %p, %s", colname, colname, i, header.titles[i], header.titles[i]);
 		if (strcmp(colname, header.titles[i]) == 0) {
