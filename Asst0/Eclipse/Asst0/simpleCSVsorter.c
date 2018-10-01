@@ -21,8 +21,6 @@ int SetHeader(Header h) {
 	int arrsize = 1;
 	int position = 0;
 
-	h.titles = (char**) malloc(arrsize * sizeof(char*));
-
 	size_t i = 0;
 	size_t linepos = 0;
 	size_t linelength = strlen(line);
@@ -248,6 +246,7 @@ int main(int argc, char ** argv) {
 
 	// Get column titles
 	Header header = { NULL, NULL };
+	header.titles = (char**) malloc(sizeof(char*));
 
 	int i = 0;
 	int c = SetHeader(header); // Number of columns in table
