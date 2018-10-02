@@ -286,6 +286,8 @@ int main(int argc, char ** argv) {
 		return 0;
 	}
 
+	printf("Format: %d\n\n", header.types[index]);
+
 	Row* out = mergeSort(rows, rowcount, index, header.types[index]);
 
 	free(rows);
