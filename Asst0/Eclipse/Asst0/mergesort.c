@@ -34,7 +34,14 @@ int intComparator(void* n1, void* n2) {
  * @return number > 0 if n1 > n2, 0 if n1 = n2, number < 0 if n1 < n2
  */
 int doubleComparator(void* n1, void* n2) {
-	return *((double*)n1) - *((double*)n2);
+	double d = *((double*)n1) - *((double*)n2);
+	if (d < 0.0) {
+		return -1;
+	} else if (d > 0.0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /**
