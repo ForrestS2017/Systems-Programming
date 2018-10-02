@@ -34,7 +34,14 @@ int intComparator(void* n1, void* n2) {
  * @return number > 0 if n1 > n2, 0 if n1 = n2, number < 0 if n1 < n2
  */
 int doubleComparator(void* n1, void* n2) {
-	return *((double*)n1) - *((double*)n2);
+	double d = *((double*)n1) - *((double*)n2);
+	if (d < 0.0) {
+		return -1;
+	} else if (d > 0.0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /**
@@ -101,7 +108,11 @@ char* trim(char* str) {
  */
 Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, format f) {
 
-	Row* result = malloc(sizeof(Row) * (length1 + length2)); // Auxiliary array containing result
+	Row* result = (Row*)malloc(sizeof(Row) * (length1 + length2)); // Auxiliary array containing result
+	if (result == NULL) {
+		printf("ERROR: malloc failed\n");
+		return NULL;
+	}
 	int lIndex = 0; // Current index in left array
 	int rIndex = 0; // Current index in right array
 	int aIndex = 0; // Current index in auxiliary array
@@ -115,9 +126,9 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 			} else if (strcmp(e2, "") == 0) {
 				result[aIndex++] = arrows2[rIndex++];
 			} else {
-				int n1 = atoi(e1);
-				int n2 = atoi(e2);
-				if (intComparator(&n1, &n2) < 0) {
+				double n1 = atof(e1);
+				double n2 = atof(e2);
+				if (doubleComparator(&n1, &n2) < 0) {
 					result[aIndex++] = arrows1[lIndex++];
 				} else {
 					result[aIndex++] = arrows2[rIndex++];
