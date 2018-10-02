@@ -278,7 +278,7 @@ int main(int argc, char ** argv) {
 	int i = 0;
 	int c = SetHeader(&header); // Number of columns in table
 	if (c == -1) {
-		printf("ERROR: No columns found.");
+		printf("ERROR: No columns found.\n");
 		return 0;
 	}
 	header.types = (format*)malloc(sizeof(format) * c);
