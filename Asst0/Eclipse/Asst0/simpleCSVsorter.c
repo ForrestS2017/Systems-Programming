@@ -263,7 +263,7 @@ int main(int argc, char ** argv) {
 	}
 
 	if (strcmp(argv[1], "-c") != 0) {
-		printf("ERROR: Invalid first argument found. Can only use -c to indicate sorting by column.");
+		printf("ERROR: Invalid first argument found. Can only use -c to indicate sorting by column.\n");
 		return 0;
 	}
 
