@@ -108,7 +108,11 @@ char* trim(char* str) {
  */
 Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, format f) {
 
-	Row* result = malloc(sizeof(Row) * (length1 + length2)); // Auxiliary array containing result
+	Row* result = (Row*)malloc(sizeof(Row) * (length1 + length2)); // Auxiliary array containing result
+	if (result == NULL) {
+		printf("ERROR: malloc failed\n");
+		return NULL;
+	}
 	int lIndex = 0; // Current index in left array
 	int rIndex = 0; // Current index in right array
 	int aIndex = 0; // Current index in auxiliary array
