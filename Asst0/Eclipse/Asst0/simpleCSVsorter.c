@@ -29,10 +29,10 @@ int SetHeader(Header* h) {
 
 		if (position >= arrsize) {
 			arrsize *= 2;
-			h->titles = (format*)realloc(h->titles, sizeof(char*) * (arrsize + 1));
+			h->titles = (char**)realloc(h->titles, sizeof(char*) * (arrsize + 1));
 			if (h->titles == NULL) {
 				printf("ERROR: realloc failed\n");
-				return NULL;
+				return -1;
 			}
 		}
 
@@ -41,7 +41,7 @@ int SetHeader(Header* h) {
 		char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
 		if (entry == NULL) {
 			printf("ERROR: malloc failed\n");
-			return NULL;
+			return -1;
 		}
 
 		int a = 0;
@@ -76,7 +76,7 @@ int SetHeader(Header* h) {
 				entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
 				if (entry == NULL) {
 					printf("ERROR: realloc failed\n");
-					return NULL;
+					return -1;
 				}
 				for (a = entrylength / 2 + 2; a < entrylength; a++) {
 					entry[a] = '\0';
@@ -169,7 +169,7 @@ char** GetLine() {
 				entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
 				if (entry == NULL) {
 					printf("ERROR: realloc failed\n");
-					return -1;
+					return NULL;
 				}
 				for (a = entrylength / 2 + 2; a < entrylength; a++) {
 					entry[a] = '\0';
@@ -228,7 +228,7 @@ int FillRows(Row** Rows, Header* header, int columns) {
 			*Rows = (Row*)realloc(*Rows, capacity * sizeof(Row));
 			if (*Rows == NULL) {
 				printf("ERROR: realloc failed\n");
-				return NULL;
+				return -1;
 			}
 			for (w = capacity / 2 + 2; w < capacity; w++) {
 				(*Rows)[w].entries = NULL;
@@ -263,7 +263,7 @@ int main(int argc, char ** argv) {
 	}
 
 	if (strcmp(argv[1], "-c") != 0) {
-		printf("Error: Invalid first argument found. Can only use -c to indicate sorting by column.");
+		printf("ERROR: Invalid first argument found. Can only use -c to indicate sorting by column.");
 		return 0;
 	}
 
