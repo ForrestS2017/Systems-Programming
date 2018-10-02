@@ -211,7 +211,7 @@ int FillRows(Row** Rows, Header* header, int columns) {
 
 		if (rows >= capacity) {
 			capacity *= 2;
-			(*Rows) = realloc((*Rows), capacity * sizeof(Row));
+			*Rows = realloc(*Rows, capacity * sizeof(Row));
 			for (w = capacity / 2 + 2; w < capacity; w++) {
 				(*Rows)[w].entries = NULL;
 			}
@@ -285,6 +285,8 @@ int main(int argc, char ** argv) {
 		printf("u dun goofd\n");
 		return 0;
 	}
+
+	printf("Format: %d\n\n", header.types[index]);
 
 	Row* out = mergeSort(rows, rowcount, index, header.types[index]);
 
