@@ -126,8 +126,8 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 			} else if (strcmp(e2, "") == 0) {
 				result[aIndex++] = arrows2[rIndex++];
 			} else {
-				int n1 = atof(e1);
-				int n2 = atof(e2);
+				double n1 = atof(e1);
+				double n2 = atof(e2);
 				if (doubleComparator(&n1, &n2) < 0) {
 					result[aIndex++] = arrows1[lIndex++];
 				} else {
