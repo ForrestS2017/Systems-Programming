@@ -128,7 +128,7 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 			} else {
 				double n1 = atof(e1);
 				double n2 = atof(e2);
-				if (doubleComparator(&n1, &n2) < 0) {
+				if (doubleComparator(&n1, &n2) <= 0) {
 					result[aIndex++] = arrows1[lIndex++];
 				} else {
 					result[aIndex++] = arrows2[rIndex++];
@@ -146,7 +146,7 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 			} else {
 				double d1 = atof(e1);
 				double d2 = atof(e2);
-				if (doubleComparator(&d1, &d2) < 0) {
+				if (doubleComparator(&d1, &d2) <= 0) {
 					result[aIndex++] = arrows1[lIndex++];
 				} else {
 					result[aIndex++] = arrows2[rIndex++];
@@ -164,7 +164,7 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 			} else {
 				char* s1 = trim(e1);
 				char* s2 = trim(e2);
-				if (stringComparator(s1, s2) < 0) {
+				if (stringComparator(s1, s2) <= 0) {
 					result[aIndex++] = arrows1[lIndex++];
 				} else {
 					result[aIndex++] = arrows2[rIndex++];
