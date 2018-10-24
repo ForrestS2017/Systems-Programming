@@ -11,9 +11,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <dirent.h>
 
 #ifndef SCANNERCSVSORTER_H_
 #define SCANNERCSVSORTER_H_
+char* inPath = NULL, outPath = NULL;
+DIR* inDir = NULL, outDir = NULL;
 
 /***** Variables, Structs, Prototypes *****/
 

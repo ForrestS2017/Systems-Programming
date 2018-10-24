@@ -257,15 +257,69 @@ int GetIndex(char** source, char* target) {
 
 int main(int argc, char ** argv) {
 
-	if (argc != 3) {
-		fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./simpleCSVsorter <sortBy> <columnName>\nExample:./simpleCSVsorter -c food\n");
+	// Check for correct argument count
+	if (argc != 3 || argc != 5 || argc != 7) {
+		fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
 		return 0;
 	}
 
-	if (strcmp(argv[1], "-c") != 0) {
-		fprintf(stderr, "ERROR: Invalid first argument found. Can only use -c to indicate sorting by column.\n");
-		return 0;
+	// Check if user is using proper arguments by iterating over two args at a time
+	int argpos = 1, errors = 0;
+	char* colname = NULL;
+	int[] flags = [0,0,0];
+
+	for(argpos = 1; argpos < argc; argpos++){
+		if (strcmp(argv[argpos], "-c") == 0) {
+			colname = argv[argpos+1];
+			flags[0]++;
+		} else if (strcmp(argv[argpos], "-d") == 0) {
+			inPath = argv[argpos+1];
+			inDir = opendir(inputPath);
+			flags[1]++;
+		} else if (strcmp(argv[argpos], "-o") == 0) {
+			outPath = argv[argpos+1];
+			outDir = opendir(outPath);
+			flags[2]++;
+		} else {
+			fprintf(STDERR, "ERROR: Invalid flag. Only use -c, -d, or -o\n");
+			return -1;
+		}
 	}
+
+// Handle missing -c, -d, and -o flags
+
+if(flags[0] != 1) {
+	fprintf(STDERR, "ERROR: Missing/ambiguous column to sort by. Please enter the column name after -c\n");
+	return -1;
+}
+if(flags[1] < 1) {
+	inPath = ".";
+	inDir = opendir(inputPath);
+}
+if(flags[2] < 1) {
+	outPath = ".";
+	outDir = opendir(outPath);
+}
+
+// Handle too many -d or -o flags
+
+if(flags[1] > 1 || flags[2] > 1) {
+	fprintf(STDERR, "ERROR: Too many targeted directories. Limit to one input and one output directory.\n");
+	return -1;
+}
+
+// Handle non-existent directory
+
+if(!(inDirr || outDir)) {
+	fprintf(STDERR, "ERROR: Directory not found. Missing directories will not be created.\n");
+	return -1;
+}
+
+// Print required metadata
+int pid = getpid();
+fprintf(STDOUT, "Initial PID: %d\n", pid);
+
+
 
 	// Get column titles
 	Header header = { NULL, NULL };
@@ -300,7 +354,6 @@ int main(int argc, char ** argv) {
 	int rowcount = FillRows(&rows, &header, c);
 
 	int index = -1; // index of column to sort on
-	char* colname = argv[2];
 	for (i = 0; i < c; i++) {
 		if (strcmp(colname, header.titles[i]) == 0) {
 			index = i;
