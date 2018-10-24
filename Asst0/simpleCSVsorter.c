@@ -7,6 +7,7 @@
 
 #include "simpleCSVsorter.h"
 
+
 int SetHeader(Header* h) {
 
 	size_t length = 0;
@@ -324,6 +325,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 	printf("\n");
+    
 	for (i = 0; i < rowcount; i++) {
 		for (p = 0; p < c; p++){
 			printf("%s", out[i].entries[p]);
@@ -335,6 +337,8 @@ int main(int argc, char ** argv) {
 	}
 
 	free(out);
+    
+    printf("\n");
 
 	return 0;
 }

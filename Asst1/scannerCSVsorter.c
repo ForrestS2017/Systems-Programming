@@ -90,7 +90,5 @@ int main(int argc, char ** argv) {
 
 	free(out);
 
-	printf("\n");
-
 	return 0;
 }
