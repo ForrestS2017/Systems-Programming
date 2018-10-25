@@ -1,24 +1,18 @@
-/*
-* simpleCSVsorter.c
-*
-*  Created on: Sep 20, 2018
-*      Author: Justin Chan, Forrest Smith
-*/
-
 #include "scannerCSVsorter.h"
 
 int main(int argc, char ** argv) {
 
+    // THIS DOESN'T WORK
 	// Check if flags and arguments are correct
-	if(!CheckInput(argc, argv)) {
+	/*if (!CheckInput(argc, argv)) {
 		return -1;
 	}
 
 	// Print required metadata
 	int pid = getpid();
-	fprintf(stdout, "Initial PID: %d\n", pid);
-
-
+	fprintf(stdout, "Initial PID: %d\n", pid);*/
+    
+    colname = argv[2]; // here so the rest of the program can run until it can be properly set
 
 	// Get column titles
 	Header header = { NULL, NULL };
@@ -40,7 +34,7 @@ int main(int argc, char ** argv) {
 		return 0;
 	}
 	for (i = 0; i < c; i++) {
-		header.types[i] = INTEGER;
+		header.types[i] = NUMBER;
 	}
 
 	Row* rows = (Row*)malloc(sizeof(Row));
@@ -51,10 +45,15 @@ int main(int argc, char ** argv) {
 	rows[0].entries = NULL;
 
 	int rowcount = FillRows(&rows, &header, c);
+    
+    if (rowcount == -1) {
+        fprintf(stderr, "ERROR: Number of columns does not match the number of headings\n");
+        return 0;
+    }
 
 	int index = -1; // index of column to sort on
 	for (i = 0; i < c; i++) {
-		if (strcmp(colname, header.titles[i]) == 0) {
+		if (strcmp(colname, trim(header.titles[i])) == 0) {
 			index = i;
 			break;
 		}
@@ -63,7 +62,9 @@ int main(int argc, char ** argv) {
 	if (index == -1) {
 		fprintf(stderr, "ERROR: '%s' is not a column found in this file.\n", colname);
 		return 0;
-	}
+	} else if (index == -2) {
+        return 0;
+    }
 
 	Row* out = mergeSort(rows, rowcount, index, header.types[index]);
 

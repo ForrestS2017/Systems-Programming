@@ -1,7 +1,7 @@
 all: scannerCSVsorter
 
-scannerCSVsorter:
-	gcc -fsanitize=address -g -o scannerCSVsorter scannerCSVsorter.c mergesort.c
+scannerCSVsorter: scannerCSVsorter.c scannerCSVsorter.h mergesort.c sorter.c
+	gcc -fsanitize=address -g -o scannerCSVsorter scannerCSVsorter.c mergesort.c sorter.c
 
 clean: 
 	rm -rf scannerCSVsorter
