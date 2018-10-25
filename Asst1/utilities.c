@@ -7,63 +7,63 @@
 * @return -1 if any fatal errors, otherwise 1 upon success
 */
 int CheckInput(int argc, char** argv) {
-	// Check for correct argument count
-	if (argc != 3 && argc != 5 && argc != 7) { // terrible way to do this, we need to fix it later
-		fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
-		return 0; // No idea what I'm supposed to be returning
-	}
+    // Check for correct argument count
+    if (argc != 3 && argc != 5 && argc != 7) { // terrible way to do this, we need to fix it later
+        fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
+        return 0; // No idea what I'm supposed to be returning
+    }
 
-	// Check if user is using proper arguments by iterating over two args at a time
-	int argpos = 1, errors = 0;
-	int flags[3] = {0,0,0};
+    // Check if user is using proper arguments by iterating over two args at a time
+    int argpos = 1, errors = 0;
+    int flags[3] = {0,0,0};
 
-	for (argpos = 1; argpos < argc; argpos++) {
-		if (strcmp(argv[argpos], "-c") == 0) { // this causes segfault, we can't access argv
-			strcpy(argv[argpos + 1], colname);
-			flags[0]++;
-		} else if (strcmp(argv[argpos], "-d") == 0) {
-			strcpy(argv[argpos + 1],inPath);
-			inDir = opendir(inPath);
-			flags[1]++;
-		} else if (strcmp(argv[argpos], "-o") == 0) {
-			strcpy(argv[argpos + 1],outPath);
-			outDir = opendir(outPath);
-			flags[2]++;
-		} else {
-			fprintf(stderr, "ERROR: Invalid flag. Only use -c, -d, or -o\n");
-			return 0; // idk
-		}
-	}
+    for (argpos = 1; argpos < argc; argpos++) {
+        if (strcmp(argv[argpos], "-c") == 0) { // this causes segfault, we can't access argv
+            strcpy(argv[argpos + 1], colname);
+            flags[0]++;
+        } else if (strcmp(argv[argpos], "-d") == 0) {
+            strcpy(argv[argpos + 1],inPath);
+            inDir = opendir(inPath);
+            flags[1]++;
+        } else if (strcmp(argv[argpos], "-o") == 0) {
+            strcpy(argv[argpos + 1],outPath);
+            outDir = opendir(outPath);
+            flags[2]++;
+        } else {
+            fprintf(stderr, "ERROR: Invalid flag. Only use -c, -d, or -o\n");
+            return 0; // idk
+        }
+    }
 
-	// Handle missing -c, -d, and -o flags
+    // Handle missing -c, -d, and -o flags
 
-	if(flags[0] != 1) {
-		fprintf(stderr, "ERROR: Missing/ambiguous column to sort by. Please enter the column name after -c\n");
-		return 0; // idk
-	}
-	if(flags[1] < 1) {
-		inPath = ".";
-		inDir = opendir(inPath);
-	}
-	if(flags[2] < 1) {
-		outPath = ".";
-		outDir = opendir(outPath);
-	}
+    if(flags[0] != 1) {
+        fprintf(stderr, "ERROR: Missing/ambiguous column to sort by. Please enter the column name after -c\n");
+        return 0; // idk
+    }
+    if(flags[1] < 1) {
+        inPath = ".";
+        inDir = opendir(inPath);
+    }
+    if(flags[2] < 1) {
+        outPath = ".";
+        outDir = opendir(outPath);
+    }
 
-	// Handle too many -d or -o flags
+    // Handle too many -d or -o flags
 
-	if(flags[1] > 1 || flags[2] > 1) {
-		fprintf(stderr, "ERROR: Too many targeted directories. Limit to one input and one output directory.\n");
-		return 0; // idk
-	}
+    if(flags[1] > 1 || flags[2] > 1) {
+        fprintf(stderr, "ERROR: Too many targeted directories. Limit to one input and one output directory.\n");
+        return 0; // idk
+    }
 
-	// Handle non-existent directory
+    // Handle non-existent directory
 
-	if(!(inDir || outDir)) {
-		fprintf(stderr, "ERROR: Directory not found. Missing directories will not be created.\n");
-		return 0; // idk
-	}
-	return 1; // what
+    if(!(inDir || outDir)) {
+        fprintf(stderr, "ERROR: Directory not found. Missing directories will not be created.\n");
+        return 0; // idk
+    }
+    return 1; // what
 }
 
 /**
@@ -74,19 +74,19 @@ int CheckInput(int argc, char** argv) {
 */
 int GetIndex(char** source, char* target) {
 
-	if (!source || !target) {
-		fprintf(stderr, "ERROR: Missing source or target row");
-		return -1;
-	}
+    if (!source || !target) {
+        fprintf(stderr, "ERROR: Missing source or target row");
+        return -1;
+    }
 
-	int i = 0;
-	while (source[i]) {
-		if (strcmp(source[i], target) == 0)
-		return i;
-		i++;
-	}
+    int i = 0;
+    while (source[i]) {
+        if (strcmp(source[i], target) == 0)
+        return i;
+        i++;
+    }
 
-	return -1;
+    return -1;
 }
 
 /**
@@ -96,92 +96,96 @@ int GetIndex(char** source, char* target) {
 */
 int GetLine(char*** row) {
 
-	// Use getLine to get current line and store in "line" variable
-	size_t length = 0;
-	char* line = NULL;
-	getline(&line, &length, stdin);
-	if (feof(stdin)) {
-		return -1;
-	}
+    if (feof(stdin)) {
+        return -1;
+    }
 
-	// Create 2D array to hold each entry
-	int quotes = 0;
-	int arrsize = 1;
-	int position = 0;
-	char** entries = (char**) malloc(arrsize * sizeof(char*));
-	if (entries == NULL) {
-		fprintf(stderr, "ERROR: malloc failed\n");
-		return -2;
-	}
+    // Use getLine to get current line and store in "line" variable
+    size_t length = 0;
+    char* line = NULL;
+    getline(&line, &length, stdin);
+    if (strcmp(line, "") == 0) {
+        return -1;
+    }
 
-	// Parse for commas and quotes
-	size_t i = 0;
-	size_t linepos = 0;
-	size_t linelength = strlen(line);
+    // Create 2D array to hold each entry
+    int quotes = 0;
+    int arrsize = 1;
+    int position = 0;
+    char** entries = (char**) malloc(arrsize * sizeof(char*));
+    if (entries == NULL) {
+        fprintf(stderr, "ERROR: malloc failed\n");
+        return -2;
+    }
 
-	// While still entering entries
-	while (linepos < linelength) {
+    // Parse for commas and quotes
+    size_t i = 0;
+    size_t linepos = 0;
+    size_t linelength = strlen(line);
 
-		// If we have more entries than array size, double array length
-		if (position >= arrsize) {
-			arrsize *= 2;
-			entries = (char**)realloc(entries, sizeof(char *) * arrsize);
-			if (entries == NULL) {
-				fprintf(stderr, "ERROR: realloc failed\n");
-				return -2;
-			}
-		}
+    // While still entering entries
+    while (linepos < linelength) {
 
-		i = 0;
-		size_t entrylength = 30;
-		char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
-		if (entry == NULL) {
-			fprintf(stderr, "ERROR: malloc failed\n");
-			return -2;
-		}
+        // If we have more entries than array size, double array length
+        if (position >= arrsize) {
+            arrsize *= 2;
+            entries = (char**)realloc(entries, sizeof(char *) * arrsize);
+            if (entries == NULL) {
+                fprintf(stderr, "ERROR: realloc failed\n");
+                return -2;
+            }
+        }
 
-		int a = 0;
-		for (a = 0; a < entrylength; a++) {
-			entry[a] = '\0';
-		}
+        i = 0;
+        size_t entrylength = 30;
+        char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
+        if (entry == NULL) {
+            fprintf(stderr, "ERROR: malloc failed\n");
+            return -2;
+        }
 
-		// While reading from the entries line
-		while (linepos < linelength) {
-			char c = line[linepos];
+        int a = 0;
+        for (a = 0; a < entrylength; a++) {
+            entry[a] = '\0';
+        }
 
-			// Check for quotes
-			if (c == '"' && quotes == 0)
-			quotes++;
-			else if (c == '"' && quotes == 1)
-			quotes--;
+        // While reading from the entries line
+        while (linepos < linelength) {
+            char c = line[linepos];
 
-			// Check for commas sans quotes
-			if ((c == ',' && quotes == 0) || c == '\n') {
-				linepos++;
-				break;
-			}
-			entry[i] = line[linepos];
+            // Check for quotes
+            if (c == '"' && quotes == 0)
+            quotes++;
+            else if (c == '"' && quotes == 1)
+            quotes--;
 
-			i++;
-			linepos++;
-			if (i >= entrylength) {
-				entrylength *= 2;
-				entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
-				if (entry == NULL) {
-					fprintf(stderr, "ERROR: realloc failed\n");
-					return -2;
-				}
-				for (a = entrylength / 2 + 2; a < entrylength; a++) {
-					entry[a] = '\0';
-				}
-			}
-		}
-		entries[position] = entry;
-		position++;
-	}
+            // Check for commas sans quotes
+            if ((c == ',' && quotes == 0) || c == '\n') {
+                linepos++;
+                break;
+            }
+            entry[i] = line[linepos];
+
+            i++;
+            linepos++;
+            if (i >= entrylength) {
+                entrylength *= 2;
+                entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
+                if (entry == NULL) {
+                    fprintf(stderr, "ERROR: realloc failed\n");
+                    return -2;
+                }
+                for (a = entrylength / 2 + 2; a < entrylength; a++) {
+                    entry[a] = '\0';
+                }
+            }
+        }
+        entries[position] = entry;
+        position++;
+    }
 
     *row = entries;
-	return position;
+    return position;
 }
 
 /**
@@ -192,17 +196,17 @@ int GetLine(char*** row) {
 * @return number of rows
 */
 int FillRows(Row** Rows, Header* header, int columns) {
-	int rows = 0;
-	int capacity = 1;
-	int w = 0;
+    int rows = 0;
+    int capacity = 1;
+    int w = 0;
 
-	while (1) {
-		char** entries = NULL;
+    while (1) {
+        char** entries = NULL;
         int c = GetLine(&entries);
         
-		if (entries == NULL) {
-			return rows;
-		}
+        if (entries == NULL) {
+            return rows;
+        }
         
         if (c != columns) {
             if (c == -2) {
@@ -212,27 +216,27 @@ int FillRows(Row** Rows, Header* header, int columns) {
             }
         }
 
-		(*Rows)[rows].entries = entries;
-		for (w = 0; w < columns; w++) {
-			format t = getType(entries[w]);
-			if (t > header->types[w]) {
-				header->types[w] = t;
-			}
-		}
-		rows++;
-		if (rows >= capacity) {
-			capacity *= 2;
-			*Rows = (Row*)realloc(*Rows, capacity * sizeof(Row));
-			if (*Rows == NULL) {
-				fprintf(stderr, "ERROR: realloc failed\n");
-				return -2;
-			}
-			for (w = capacity / 2 + 2; w < capacity; w++) {
-				(*Rows)[w].entries = NULL;
-			}
-		}
-	}
-	return rows;
+        (*Rows)[rows].entries = entries;
+        for (w = 0; w < columns; w++) {
+            format t = getType(entries[w]);
+            if (t > header->types[w]) {
+                header->types[w] = t;
+            }
+        }
+        rows++;
+        if (rows >= capacity) {
+            capacity *= 2;
+            *Rows = (Row*)realloc(*Rows, capacity * sizeof(Row));
+            if (*Rows == NULL) {
+                fprintf(stderr, "ERROR: realloc failed\n");
+                return -2;
+            }
+            for (w = capacity / 2 + 2; w < capacity; w++) {
+                (*Rows)[w].entries = NULL;
+            }
+        }
+    }
+    return rows;
 }
 
 /**
@@ -243,84 +247,88 @@ int FillRows(Row** Rows, Header* header, int columns) {
 
 int SetHeader(Header* h) {
 
-	size_t length = 0;
-	char* line = NULL;
-	getline(&line, &length, stdin);
-	if (feof(stdin)) {
-		return -1;
-	}
+    if (feof(stdin)) {
+        return -1;
+    }
 
-	int quotes = 0;
-	int arrsize = 1;
-	int position = 0;
+    size_t length = 0;
+    char* line = NULL;
+    getline(&line, &length, stdin);
+    if (strcmp(line, "") == 0) {
+        return -1;
+    }
 
-	size_t i = 0;
-	size_t linepos = 0;
-	size_t linelength = strlen(line);
+    int quotes = 0;
+    int arrsize = 1;
+    int position = 0;
 
-	while (linepos < linelength) {
+    size_t i = 0;
+    size_t linepos = 0;
+    size_t linelength = strlen(line);
 
-		if (position >= arrsize) {
-			arrsize *= 2;
-			h->titles = (char**)realloc(h->titles, sizeof(char*) * (arrsize + 1));
-			if (h->titles == NULL) {
-				fprintf(stderr, "ERROR: realloc failed\n");
-				return -1;
-			}
-		}
+    while (linepos < linelength) {
 
-		i = 0;
-		size_t entrylength = 30;
-		char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
-		if (entry == NULL) {
-			fprintf(stderr, "ERROR: malloc failed\n");
-			return -1;
-		}
+        if (position >= arrsize) {
+            arrsize *= 2;
+            h->titles = (char**)realloc(h->titles, sizeof(char*) * (arrsize + 1));
+            if (h->titles == NULL) {
+                fprintf(stderr, "ERROR: realloc failed\n");
+                return -1;
+            }
+        }
 
-		int a = 0;
-		for (a = 0; a < entrylength; a++) {
-			entry[a] = '\0';
-		}
+        i = 0;
+        size_t entrylength = 30;
+        char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
+        if (entry == NULL) {
+            fprintf(stderr, "ERROR: malloc failed\n");
+            return -1;
+        }
 
-		while (linepos < linelength) {
-			char c = line[linepos];
+        int a = 0;
+        for (a = 0; a < entrylength; a++) {
+            entry[a] = '\0';
+        }
 
-			if (c == '"' && quotes == 0)
-			quotes++;
-			else if (c == '"' && quotes == 1)
-			quotes--;
+        while (linepos < linelength) {
+            char c = line[linepos];
 
-			if ((c == ',' && quotes == 0) || c == '\n') {
-				linepos++;
-				break;
-			}
+            if (c == '"' && quotes == 0)
+            quotes++;
+            else if (c == '"' && quotes == 1)
+            quotes--;
 
-			if (c == '\r') {
-				linepos++;
-				continue;
-			}
+            if ((c == ',' && quotes == 0) || c == '\n') {
+                linepos++;
+                break;
+            }
 
-			entry[i] = line[linepos];
+            if (c == '\r') {
+                linepos++;
+                continue;
+            }
 
-			i++;
-			linepos++;
-			if (i >= entrylength) {
-				entrylength *= 2;
-				entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
-				if (entry == NULL) {
-					fprintf(stderr, "ERROR: realloc failed\n");
-					return -1;
-				}
-				for (a = entrylength / 2 + 2; a < entrylength; a++) {
-					entry[a] = '\0';
-				}
-			}
-		}
-		h->titles[position] = entry;
-		position++;
-	}
+            entry[i] = line[linepos];
 
-	return position;
+            i++;
+            linepos++;
+            if (i >= entrylength) {
+                entrylength *= 2;
+                entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
+                if (entry == NULL) {
+                    fprintf(stderr, "ERROR: realloc failed\n");
+                    return -1;
+                }
+                for (a = entrylength / 2 + 2; a < entrylength; a++) {
+                    entry[a] = '\0';
+                }
+            }
+        }
+        h->titles[position] = entry;
+        position++;
+    }
+
+    return position;
 }
 
 /**
@@ -329,50 +337,50 @@ int SetHeader(Header* h) {
  * @return Formatted string
  */
 char* trim(char* str) {
-	int length = strlen(str);
-	char * ret = (char*)malloc(sizeof(char) * (length + 1));
-	if (ret == NULL) {
-		fprintf(stderr, "ERROR: malloc returned null in trim function");
-		return str;
-	}
-	int j = 0;
-	int i = 0;
-	char prev = '\0';
-	char firstNonSpaceChar = '\0';
-	short started = 0; // for determining whether string started or not... quotes and spaces don't count as start
-	for (i = 0; i < length; i++) {
-		if (started == 0 && (str[i] == '"' || str[i] == ' ')) {
-			if (str[i] == '"' && firstNonSpaceChar == '\0') {
-				firstNonSpaceChar = '"';
-			}
-			continue;
-		}
-		if (str[i] == '"' && i == length - 1 && firstNonSpaceChar == '"') {
-			break;
-		}
-		if (str[i] == ' ') {
-			prev = ' ';
-			continue;
-		}
-		if (isspace(str[i])) {
-			continue;
-		}
+    int length = strlen(str);
+    char * ret = (char*)malloc(sizeof(char) * (length + 1));
+    if (ret == NULL) {
+        fprintf(stderr, "ERROR: malloc returned null in trim function");
+        return str;
+    }
+    int j = 0;
+    int i = 0;
+    char prev = '\0';
+    char firstNonSpaceChar = '\0';
+    short started = 0; // for determining whether string started or not... quotes and spaces don't count as start
+    for (i = 0; i < length; i++) {
+        if (started == 0 && (str[i] == '"' || str[i] == ' ')) {
+            if (str[i] == '"' && firstNonSpaceChar == '\0') {
+                firstNonSpaceChar = '"';
+            }
+            continue;
+        }
+        if (str[i] == '"' && i == length - 1 && firstNonSpaceChar == '"') {
+            break;
+        }
+        if (str[i] == ' ') {
+            prev = ' ';
+            continue;
+        }
+        if (isspace(str[i])) {
+            continue;
+        }
 
-		if (prev == ' ') {
-			ret[j] = ' ';
-			j++;
-		}
+        if (prev == ' ') {
+            ret[j] = ' ';
+            j++;
+        }
 
-		if (started == 0) {
-			started = 1;
-		}
+        if (started == 0) {
+            started = 1;
+        }
 
-		ret[j] = str[i];
-		j++;
-		prev = str[i];
-	}
-	ret[j] = '\0';
-	return ret;
+        ret[j] = str[i];
+        j++;
+        prev = str[i];
+    }
+    ret[j] = '\0';
+    return ret;
 }
 
 /**
@@ -381,23 +389,23 @@ char* trim(char* str) {
 * @return format of input str
 */
 format getType(char* str) {
-	int i = 0;
+    int i = 0;
     char * s = trim(str);
-	int n = strlen(s);
-	format ret = NUMBER;
-	int periods = 0;
-	for (i = 0; i < n; i++) {
-		if (i == 0 && s[i] == '-') {
-			continue;
-		} else if (!isdigit(s[i])) {
-			if (s[i] == '.' && periods == 0) {
-				periods++;
-			} else {
-				ret = STRING;
-				break;
-			}
-		}
-	}
+    int n = strlen(s);
+    format ret = NUMBER;
+    int periods = 0;
+    for (i = 0; i < n; i++) {
+        if (i == 0 && s[i] == '-') {
+            continue;
+        } else if (!isdigit(s[i])) {
+            if (s[i] == '.' && periods == 0) {
+                periods++;
+            } else {
+                ret = STRING;
+                break;
+            }
+        }
+    }
     free(s);
-	return ret;
+    return ret;
 }

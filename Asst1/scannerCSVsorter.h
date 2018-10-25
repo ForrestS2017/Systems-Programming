@@ -20,12 +20,12 @@ DIR* outDir;
 typedef enum _format{ NUMBER=1, STRING=2 } format;
 
 typedef struct _Header {		// Only for first row data
-	char** titles;			// Hold the titles of each column
-	format* types;		// Declare the types of each column, corresponds with row entry
+    char** titles;			// Hold the titles of each column
+    format* types;		// Declare the types of each column, corresponds with row entry
 } Header;
 
 typedef struct _Row {
-	char** entries;			// Hold each entry of the row. The type of each corresponds to format enum
+    char** entries;			// Hold each entry of the row. The type of each corresponds to format enum
 } Row;
 
 /***** Functions *****/
