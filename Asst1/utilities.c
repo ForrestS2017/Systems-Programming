@@ -1,5 +1,9 @@
 #include "scannerCSVsorter.h"
 
+// WEXITSTATUS
+
+// CHECKINPUT IS NOT USED
+
 /**
 * Calls getline() and returns the line parsed into a char** array where delimiter = ','
 * @param argc Number of arguments
@@ -7,6 +11,7 @@
 * @return -1 if any fatal errors, otherwise 1 upon success
 */
 int CheckInput(int argc, char** argv) {
+    
     // Check for correct argument count
     if (argc != 3 && argc != 5 && argc != 7) { // terrible way to do this, we need to fix it later
         fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
@@ -45,7 +50,7 @@ int CheckInput(int argc, char** argv) {
         inPath = ".";
         inDir = opendir(inPath);
     }
-    if(flags[2] < 1) {
+    if(flags[2] < 1) { // nope, this is wrong
         outPath = ".";
         outDir = opendir(outPath);
     }
