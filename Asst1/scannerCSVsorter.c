@@ -12,7 +12,7 @@ int main(int argc, char ** argv) {
     char* colname;
     DIR* inDir;
     DIR* outDir;
-    
+
     char * cvalue = NULL;
     char * dvalue = NULL;
     char * ovalue = NULL;
@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
                 break;
         }
     }
-    
+
     if (cvalue == NULL) { // Don't run if value for '-c' is not found
         fprintf(stderr, "ERROR: Missing -c argument, cannot run because the column to sort on is unknown.\n");
         printf("ERROR: Missing -c argument, cannot run because the column to sort on is unknown.\n");
@@ -147,19 +147,19 @@ int main(int argc, char ** argv) {
             outDir = NULL;
         }
     }
-    
+
     // Print required metadata
     int pid = getpid();
     fprintf(stdout, "Initial PID: %d\n", pid);
-    
+
     fprintf(stdout, "PIDS of all child processes: "); // No newline, PIDs will be outputed to stdout by other processes
     fflush(stdout); // Make sure to fflush stdout so printing errors don't occur
-    
+
     int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
-    
+
     fprintf(stdout, "\n");
     fprintf(stdout, "Total number of processes: %d\n", processes);
-    
+
     // Close dirs and free stuff
     closedir(inDir);
     if (outDir != NULL) {
