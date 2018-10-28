@@ -75,7 +75,6 @@
 * @return target index, or -1 upon failure
 */
 int GetIndex(char** source, char* target) {
-
     if (!source || !target) {
         fprintf(stderr, "ERROR: Missing source or target row");
         return -1;
@@ -97,7 +96,6 @@ int GetIndex(char** source, char* target) {
 * @return Number of entries in the row
 */
 int GetLine(char*** row, int fd) {
-
     int length = 8;
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * length);
@@ -291,7 +289,6 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
 */
 
 int SetHeader(Header* h, int fd) {
-    
     int length = 8;
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * length);

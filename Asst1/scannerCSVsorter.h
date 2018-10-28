@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 #ifndef SCANNERCSVSORTER_H_
 #define SCANNERCSVSORTER_H_
@@ -55,5 +56,11 @@ int SetHeader(Header*, int);
 
 // Gets type (_format) for a cell
 format getType(char* str);
+
+int Sort(int, int, char*);
+
+int fileHandler(struct dirent*, char*, char*, char*);
+
+int directoryHandler(DIR*, char*, char*, char*);
 
 #endif /* SIMPLECSVSORTER_H_ */

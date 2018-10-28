@@ -7,7 +7,7 @@
 */
 
 int main(int argc, char ** argv) {
-    /*char* inPath;
+    char* inPath;
     char* outPath;
     char* colname;
     DIR* inDir;
@@ -66,10 +66,6 @@ int main(int argc, char ** argv) {
         int length = strlen(dvalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
         int absolute = 0;
-        if (name == NULL) {
-            printf("malloc failed\n");
-            return 1;
-        }
         name[length + 1] = 'F'; // Testing to make sure strcpy/strcat add null terminators
         if (length > 0) {
             if (strcmp(dvalue, ".") == 0) {
@@ -110,10 +106,6 @@ int main(int argc, char ** argv) {
         int length = strlen(ovalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
         int absolute = 0;
-        if (name == NULL) {
-            printf("malloc failed\n");
-            return 1;
-        }
         name[length + 1] = 'F';
         if (length > 0) {
             if (strcmp(ovalue, ".") == 0) {
@@ -147,95 +139,43 @@ int main(int argc, char ** argv) {
             outPath = NULL;
             outDir = NULL;
         }
-    }*/
-
-    // Print required metadata
-    /*int pid = getpid();
-    fprintf(stdout, "Initial PID: %d\n", pid);*/
-    //fprintf(stdout, "PIDS of all child processes:");
-    //fprintf(stdout, "Total number of processes:");
-
-    char * colname = argv[2];
+    }
     
-    // Get column titles
-    Header header = { NULL, NULL };
-    header.titles = (char**) malloc(sizeof(char*) * 10);
-    if (header.titles == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
-    }
-
-    int i = 0;
-    int c = SetHeader(&header, 0); // Number of columns in table
-    if (c == -1) {
-        fprintf(stderr, "ERROR: No heading or columns found.\n");
-        return 0;
-    }
-    header.types = (format*)malloc(sizeof(format) * c);
-    if (header.types == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
-    }
-    for (i = 0; i < c; i++) {
-        header.types[i] = NUMBER;
-    }
-
-    Row* rows = (Row*)malloc(sizeof(Row));
-    if (rows == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
-    }
-    rows[0].entries = NULL;
-
-    int rowcount = FillRows(&rows, &header, c, 0);
-   
-    if (rowcount == -1) {
-        fprintf(stderr, "ERROR: Number of columns does not match the number of headings\n");
-        return 0;
-    } else if (rowcount == 0) {
-        fprintf(stderr, "ERROR: No records found in this file.\n");
-        return 0;
-    }
-
-    int index = -1; // index of column to sort on
-    for (i = 0; i < c; i++) {
-        if (strcmp(colname, trim(header.titles[i])) == 0) {
-            index = i;
-            break;
+    /*char * column = "movie_title";
+    char ending[strlen(column) + 13];
+    strcpy(ending, "-sorted-");
+    strcat(ending, column);
+    strcat(ending, ".csv");
+    int l = strlen(ending);
+    
+    char * d_name = "movie_metadata-sorted-movie_title.csv";
+    int n = strlen(d_name);        
+    if (n > l) {
+        printf("d_name: |%s|\n", d_name);
+        printf("d_name + (n - l): |%s|\n", d_name + (n - l));
+        printf("ending: |%s|\n", ending);
+        if (strcmp(d_name + (n - l), ending) == 0) { // Check if file ends with -sorted-<fieldname>.csv
+            printf("HI\n");
+        } else {
+            printf("BYE\n");
         }
     }
-
-    if (index == -1) {
-        fprintf(stderr, "ERROR: '%s' is not a column found in this file.\n", colname);
-        return 0;
-    } else if (index == -2) {
-        return 0;
-    }
-
-    Row* out = mergeSort(rows, rowcount, index, header.types[index]);
-
-    free(rows);
-
-    int p = 0;
-    for (p = 0; p < c; p++) {
-        printf("%s", header.titles[p]); // print out the top row
-        if (p != c - 1) {
-            printf(",");
-        }
-    }
-    printf("\n");
-
-    for (i = 0; i < rowcount; i++) {
-        for (p = 0; p < c; p++){
-            printf("%s", out[i].entries[p]);
-            if (p != c - 1) {
-                printf(",");
-            }
-        }
-        printf("\n");
-    }
-
-    free(out);
+    
+    return 0;*/
+    
+    // Print required metadata
+    int pid = getpid();
+    fprintf(stdout, "Initial PID: %d\n", pid);
+    
+    fprintf(stdout, "PIDS of all child processes: ");
+    
+    int processes = directoryHandler(inDir, colname, inPath, outPath);
+    
+    fprintf(stdout, "\n");
+    fprintf(stdout, "Total number of processes: %d\n", processes);
+    
+    closedir(inDir);
+    closedir(outDir);
 
     return 0;
 }
