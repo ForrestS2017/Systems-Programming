@@ -2,8 +2,8 @@
 
 /**
  * TO-DO:
- * Create a sorter.c file or something for reading file/directory
- * Use WEXITSTATUS for counting processes? Or keep a pointer to somewhere in memory?
+ * Correct error messages, malloc and stuff
+ * free and close stuff
 */
 
 int main(int argc, char ** argv) {
@@ -17,15 +17,16 @@ int main(int argc, char ** argv) {
     char * dvalue = NULL;
     char * ovalue = NULL;
     int a;
-    opterr = 0;
+    opterr = 0; // Suppress errors from getopt
     
+    // Parse command line arguments with getopt
     while ((a = getopt(argc, argv, "c:d:o:")) != -1) {
         switch (a) {
             case 'c':
                 if (cvalue != NULL) {
                     fprintf(stderr, "Error: Multiple '-%c' flags found. Using last specified value.\n", a);
                 }
-                cvalue = optarg;
+                cvalue = optarg; // Set cvalue to argument after -c
                 break;
             case 'd':
                 if (dvalue != NULL) {
@@ -53,14 +54,14 @@ int main(int argc, char ** argv) {
         }
     }
     
-    if (cvalue == NULL) {
+    if (cvalue == NULL) { // Don't run if value for '-c' is not found
         fprintf(stderr, "ERROR: Missing -c argument, cannot run because the column to sort on is unknown.\n");
         printf("ERROR: Missing -c argument, cannot run because the column to sort on is unknown.\n");
         return 0;
     } else {
         colname = cvalue;
     }
-    if (dvalue == NULL) {
+    if (dvalue == NULL) { // Default inPath is current working directory ('.')
         inPath = "./";
     } else {
         int length = strlen(dvalue);
@@ -70,31 +71,30 @@ int main(int argc, char ** argv) {
             return 1;
         }
         int absolute = 0;
-        name[length + 1] = 'F'; // Testing to make sure strcpy/strcat add null terminators
         if (length > 0) {
             if (strcmp(dvalue, ".") == 0) {
-                strcpy(name, "./");
+                strcpy(name, "./"); // Add / to the end of the directory if it's not there
             } else {
                 int i;
                 for (i = 0; i < length; i++) {
-                    if (dvalue[i] == '/') {
+                    if (dvalue[i] == '/') { // If a / is found, assume that an absolute file path is given
                         absolute = 1;
                         break;
                     }
                 }
-                if (absolute) {
+                if (absolute) { // Copy the exact value of the -d argument if the path is absolute
                     strcpy(name, dvalue);
-                } else {
+                } else { // Else assume that the file path is relative, start with "./" then the rest of the file name
                     strcpy(name, "./");
                     strcat(name, dvalue);
                 }
-                if (dvalue[length - 1] != '/') {
+                if (dvalue[length - 1] != '/') { // Add / to the end of the directory if it's not there
                     strcat(name, "/");
                 }
             }
             inPath = name;
         } else {
-            inPath = "./";
+            inPath = "./"; // Default
         }
     }
     inDir = opendir(inPath);
@@ -114,7 +114,6 @@ int main(int argc, char ** argv) {
             return 1;
         }
         int absolute = 0;
-        name[length + 1] = 'F';
         if (length > 0) {
             if (strcmp(ovalue, ".") == 0) {
                 strcpy(name, "./");
@@ -153,22 +152,23 @@ int main(int argc, char ** argv) {
     int pid = getpid();
     fprintf(stdout, "Initial PID: %d\n", pid);
     
-    fprintf(stdout, "PIDS of all child processes: ");
-    fflush(stdout);
+    fprintf(stdout, "PIDS of all child processes: "); // No newline, PIDs will be outputed to stdout by other processes
+    fflush(stdout); // Make sure to fflush stdout so printing errors don't occur
     
-    int processes = directoryHandler(inDir, colname, inPath, outPath);
+    int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
     
     fprintf(stdout, "\n");
     fprintf(stdout, "Total number of processes: %d\n", processes);
     
+    // Close dirs and free stuff
     closedir(inDir);
     if (outDir != NULL) {
         closedir(outDir);
     }
-    if (inPath != NULL) {
+    if (dvalue != NULL) {
         free(inPath);
     }
-    if (outPath != NULL) {
+    if (ovalue != NULL) {
         free(outPath);
     }
 

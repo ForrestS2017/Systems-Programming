@@ -1,7 +1,5 @@
 #include "scannerCSVsorter.h"
 
-// CHECKINPUT IS NOT USED
-
 /**
 * Calls getline() and returns the line parsed into a char** array where delimiter = ','
 * @param argc Number of arguments

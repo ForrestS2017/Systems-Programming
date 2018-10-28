@@ -99,7 +99,6 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
     }
 
     return result;
-    // Remember to free after doing mergesort
 }
 
 /**

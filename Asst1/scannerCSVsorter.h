@@ -10,7 +10,7 @@
 #ifndef SCANNERCSVSORTER_H_
 #define SCANNERCSVSORTER_H_
 
-/***** Variables, Structs, Prototypes *****/
+/***** Variables, Structs *****/
 
 typedef enum _format{ NUMBER=1, STRING=2 } format;
 
@@ -52,15 +52,19 @@ int GetIndex(char** source, char* target);
 // Fills Rows with Row structs, using GetLine()
 int FillRows(Row**, Header*, int, int);
 
+// Sets the header for a given file
 int SetHeader(Header*, int);
 
 // Gets type (_format) for a cell
 format getType(char* str);
 
+// Sorts a file
 int Sort(int, int, char*);
 
-int fileHandler(struct dirent*, char*, char*, char*, char*, char*);
+// Handles operations on files
+int fileHandler(struct dirent*, char*, char*, char*, char*);
 
+// Handles operations on directories
 int directoryHandler(DIR*, char*, char*, char*);
 
 #endif /* SIMPLECSVSORTER_H_ */
