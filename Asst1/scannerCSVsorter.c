@@ -1,6 +1,17 @@
 #include "scannerCSVsorter.h"
 
+/**
+ * TO-DO:
+ * Create a sorter.c file or something for reading file/directory
+ * Use WEXITSTATUS for counting processes? Or keep a pointer to somewhere in memory?
+*/
+
 int main(int argc, char ** argv) {
+    /*char* inPath;
+    char* outPath;
+    char* colname;
+    DIR* inDir;
+    DIR* outDir;
     
     char * cvalue = NULL;
     char * dvalue = NULL;
@@ -30,7 +41,7 @@ int main(int argc, char ** argv) {
                 break;
             case '?':
                 if (optopt == 'c' || optopt == 'd' || optopt == 'o') {
-                    fprintf(stderr, "Error: The flag '-%c' should have an argument after it.\n", optopt);
+                    fprintf(stderr, "Error: The flag '-%c' should have an argument after it. Using default value instead.\n", optopt);
                     if (optopt == 'c') {
                         printf("ERROR: Cannot execute because the flag '-c' has no argument specified for it.\n");
                         return 0;
@@ -53,13 +64,13 @@ int main(int argc, char ** argv) {
         inPath = "./";
     } else {
         int length = strlen(dvalue);
-        char * name = (char*)malloc(sizeof(char) * (length + 3));
+        char * name = (char*)malloc(sizeof(char) * (length + 4));
         int absolute = 0;
         if (name == NULL) {
             printf("malloc failed\n");
             return 1;
         }
-        name[length + 1] = 'F';
+        name[length + 1] = 'F'; // Testing to make sure strcpy/strcat add null terminators
         if (length > 0) {
             if (strcmp(dvalue, ".") == 0) {
                 strcpy(name, "./");
@@ -76,6 +87,9 @@ int main(int argc, char ** argv) {
                 } else {
                     strcpy(name, "./");
                     strcat(name, dvalue);
+                }
+                if (dvalue[length - 1] != '/') {
+                    strcat(name, "/");
                 }
             }
             inPath = name;
@@ -94,7 +108,7 @@ int main(int argc, char ** argv) {
         outDir = NULL;
     } else {
         int length = strlen(ovalue);
-        char * name = (char*)malloc(sizeof(char) * (length + 3));
+        char * name = (char*)malloc(sizeof(char) * (length + 4));
         int absolute = 0;
         if (name == NULL) {
             printf("malloc failed\n");
@@ -118,6 +132,9 @@ int main(int argc, char ** argv) {
                     strcpy(name, "./");
                     strcat(name, ovalue);
                 }
+                if (ovalue[length - 1] != '/') {
+                    strcat(name, "/");
+                }
             }
             outPath = name;
             outDir = opendir(outPath);
@@ -130,51 +147,16 @@ int main(int argc, char ** argv) {
             outPath = NULL;
             outDir = NULL;
         }
-    }
-    
-    // For testing argument parsing
-    /*if (cvalue == NULL) {
-        printf("cvalue: NULL\n");
-    } else {
-        printf("cvalue: %s\n", cvalue);
-    }
-    if (dvalue == NULL) {
-        printf("dvalue: NULL\n");
-    } else {
-        printf("dvalue: %s\n", dvalue);
-    }
-    if (inPath == NULL) {
-        printf("inPath: NULL\n");
-    } else {
-        printf("inPath: %s\n", inPath);
-    }
-    if (inDir == NULL) {
-        printf("inDir: NULL\n");
-    } else {
-        printf("inDir: %p\n", inDir);
-    }
-    if (ovalue == NULL) {
-        printf("ovalue: NULL\n");
-    } else {
-        printf("ovalue: %s\n", ovalue);
-    }
-    if (outPath == NULL) {
-        printf("outPath: NULL\n");
-    } else {
-        printf("outPath: %s\n", outPath);
-    }
-    if (outDir == NULL) {
-        printf("outDir: NULL\n");
-    } else {
-        printf("outDir: %p\n", outDir);
     }*/
-    
-    return 0;
 
     // Print required metadata
-    int pid = getpid();
-    fprintf(stdout, "Initial PID: %d\n", pid);
+    /*int pid = getpid();
+    fprintf(stdout, "Initial PID: %d\n", pid);*/
+    //fprintf(stdout, "PIDS of all child processes:");
+    //fprintf(stdout, "Total number of processes:");
 
+    char * colname = argv[2];
+    
     // Get column titles
     Header header = { NULL, NULL };
     header.titles = (char**) malloc(sizeof(char*) * 10);
@@ -184,7 +166,7 @@ int main(int argc, char ** argv) {
     }
 
     int i = 0;
-    int c = SetHeader(&header); // Number of columns in table
+    int c = SetHeader(&header, 0); // Number of columns in table
     if (c == -1) {
         fprintf(stderr, "ERROR: No heading or columns found.\n");
         return 0;
@@ -205,13 +187,13 @@ int main(int argc, char ** argv) {
     }
     rows[0].entries = NULL;
 
-    int rowcount = FillRows(&rows, &header, c);
+    int rowcount = FillRows(&rows, &header, c, 0);
    
     if (rowcount == -1) {
         fprintf(stderr, "ERROR: Number of columns does not match the number of headings\n");
         return 0;
     } else if (rowcount == 0) {
-        fprintf(stderr, "ERROR: No records found in this file.\n", colname);
+        fprintf(stderr, "ERROR: No records found in this file.\n");
         return 0;
     }
 

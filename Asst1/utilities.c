@@ -1,7 +1,5 @@
 #include "scannerCSVsorter.h"
 
-// WEXITSTATUS
-
 // CHECKINPUT IS NOT USED
 
 /**
@@ -10,8 +8,7 @@
 * @param argv String array of arguments
 * @return -1 if any fatal errors, otherwise 1 upon success
 */
-int CheckInput(int argc, char** argv) {
-    
+/*int CheckInput(int argc, char** argv) {
     // Check for correct argument count
     if (argc != 3 && argc != 5 && argc != 7) { // terrible way to do this, we need to fix it later
         fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
@@ -69,7 +66,7 @@ int CheckInput(int argc, char** argv) {
         return 0; // idk
     }
     return 1; // what
-}
+}*/
 
 /**
 * Gets the index of an entry in a row (used for target column index)
@@ -99,17 +96,41 @@ int GetIndex(char** source, char* target) {
   @param row Destination of row entries
 * @return Number of entries in the row
 */
-int GetLine(char*** row) {
+int GetLine(char*** row, int fd) {
 
-    if (feof(stdin)) {
-        return -1;
+    int length = 8;
+    int count = 0;
+    char * line = (char*)malloc(sizeof(char) * length);
+    if (line == NULL) {
+        return -2;
     }
-
-    // Use getLine to get current line and store in "line" variable
-    size_t length = 0;
-    char* line = NULL;
-    getline(&line, &length, stdin);
-    if (strcmp(line, "") == 0) {
+    int j;
+    for (j = 0; j < length; j++) {
+        line[j] = '\0';
+    }
+    int b; // number of bytes read by read
+    char c = '\0';
+    while ((b = read(fd, &c, 1)) > 0) {
+        if (c == '\n') {
+            break;
+        } else {
+           if (count + 1 > length) {
+                length *= 2;
+                line = (char*)realloc(line, sizeof(char) * (length + 1));
+                if (line == NULL) {
+                    fprintf(stderr, "ERROR: realloc failed\n");
+                    return -2;
+                }
+                for (j = length / 2 + 2; j < length; j++) {
+                    line[j] = '\0';
+                }
+           }
+           line[count] = c;
+           count++;
+        }
+    }
+    
+    if (b == -1 || strcmp(line, "") == 0) {
         return -1;
     }
 
@@ -189,6 +210,25 @@ int GetLine(char*** row) {
         position++;
     }
 
+    if (line[linepos - 1] == ',') { // last column is null
+        if (position >= arrsize) {
+            arrsize++;
+            entries = (char**)realloc(entries, sizeof(char*) * arrsize);
+            if (entries == NULL) {
+                fprintf(stderr, "ERROR: realloc failed\n");
+                return -2;
+            }
+        }
+        char* entry = (char*) malloc(sizeof(char));
+        if (entry == NULL) {
+            fprintf(stderr, "ERROR: malloc failed\n");
+            return -2;
+        }
+        entry[0] = '\0';
+        entries[position] = entry;
+        position++;
+    }
+    
     *row = entries;
     return position;
 }
@@ -200,14 +240,14 @@ int GetLine(char*** row) {
 * @param columns Number of columns
 * @return number of rows
 */
-int FillRows(Row** Rows, Header* header, int columns) {
+int FillRows(Row** Rows, Header* header, int columns, int fd) {
     int rows = 0;
     int capacity = 1;
     int w = 0;
 
     while (1) {
         char** entries = NULL;
-        int c = GetLine(&entries);
+        int c = GetLine(&entries, fd);
         
         if (entries == NULL) {
             return rows;
@@ -250,16 +290,41 @@ int FillRows(Row** Rows, Header* header, int columns) {
 * @return Number of columns, or -1 upon failure or no columns
 */
 
-int SetHeader(Header* h) {
-
-    if (feof(stdin)) {
-        return -1;
+int SetHeader(Header* h, int fd) {
+    
+    int length = 8;
+    int count = 0;
+    char * line = (char*)malloc(sizeof(char) * length);
+    if (line == NULL) {
+        return -2;
     }
-
-    size_t length = 0;
-    char* line = NULL;
-    getline(&line, &length, stdin);
-    if (strcmp(line, "") == 0) {
+    int j;
+    for (j = 0; j < length; j++) {
+        line[j] = '\0';
+    }
+    int b; // number of bytes read by read
+    char c = '\0';
+    while ((b = read(fd, &c, 1)) > 0) {
+        if (c == '\n') {
+            break;
+        } else {
+           if (count + 1 > length) {
+                length *= 2;
+                line = (char*)realloc(line, sizeof(char) * (length + 1));
+                if (line == NULL) {
+                    fprintf(stderr, "ERROR: realloc failed\n");
+                    return -2;
+                }
+                for (j = length / 2 + 2; j < length; j++) {
+                    line[j] = '\0';
+                }
+           }
+           line[count] = c;
+           count++;
+        }
+    }
+    
+    if (b == -1 || strcmp(line, "") == 0) {
         return -1;
     }
 

@@ -9,12 +9,6 @@
 #ifndef SCANNERCSVSORTER_H_
 #define SCANNERCSVSORTER_H_
 
-char* inPath;
-char* outPath;
-char* colname;
-DIR* inDir;
-DIR* outDir;
-
 /***** Variables, Structs, Prototypes *****/
 
 typedef enum _format{ NUMBER=1, STRING=2 } format;
@@ -49,13 +43,15 @@ Row* mergeSort(Row*, int, int, format);
 int CheckInput(int, char**);
 
 // Reads current row and returns number of entries
-int GetLine(char***);
+int GetLine(char***, int);
 
 // Get Index of a row entry
 int GetIndex(char** source, char* target);
 
 // Fills Rows with Row structs, using GetLine()
-int FillRows();
+int FillRows(Row**, Header*, int, int);
+
+int SetHeader(Header*, int);
 
 // Gets type (_format) for a cell
 format getType(char* str);
