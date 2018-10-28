@@ -98,6 +98,8 @@ int GetLine(char*** row, int fd) {
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * length);
     if (line == NULL) {
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for line in GetLine, terminating GetLine.\n");
+        printf("ERROR: malloc failed when allocating memory for line in GetLine, terminating GetLine.\n");
         return -2;
     }
     int j;
@@ -114,7 +116,8 @@ int GetLine(char*** row, int fd) {
                 length *= 2;
                 line = (char*)realloc(line, sizeof(char) * (length + 1));
                 if (line == NULL) {
-                    fprintf(stderr, "ERROR: realloc failed\n");
+                    fprintf(stderr, "ERROR: realloc failed when reallocating memory for line in GetLine, terminating GetLine.\n");
+                    printf("ERROR: realloc failed when reallocating memory for line in GetLine, terminating GetLine.\n");
                     return -2;
                 }
                 for (j = length / 2 + 2; j < length; j++) {
@@ -136,7 +139,8 @@ int GetLine(char*** row, int fd) {
     int position = 0;
     char** entries = (char**) malloc(arrsize * sizeof(char*));
     if (entries == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for row entries in GetLine, terminating GetLine.\n");
+        printf("ERROR: malloc failed when allocating memory for row entries in GetLine, terminating GetLine.\n");
         return -2;
     }
 
@@ -153,7 +157,8 @@ int GetLine(char*** row, int fd) {
             arrsize *= 2;
             entries = (char**)realloc(entries, sizeof(char *) * arrsize);
             if (entries == NULL) {
-                fprintf(stderr, "ERROR: realloc failed\n");
+                fprintf(stderr, "ERROR: realloc failed when reallocating memory for row entries in GetLine, terminating GetLine.\n");
+                printf("ERROR: realloc failed when reallocating memory for row entries in GetLine, terminating GetLine.\n");
                 return -2;
             }
         }
@@ -162,7 +167,8 @@ int GetLine(char*** row, int fd) {
         size_t entrylength = 30;
         char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
         if (entry == NULL) {
-            fprintf(stderr, "ERROR: malloc failed\n");
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for entry in GetLine, terminating GetLine.\n");
+            printf("ERROR: malloc failed when allocating memory for entry in GetLine, terminating GetLine.\n");
             return -2;
         }
 
@@ -194,7 +200,8 @@ int GetLine(char*** row, int fd) {
                 entrylength *= 2;
                 entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
                 if (entry == NULL) {
-                    fprintf(stderr, "ERROR: realloc failed\n");
+                    fprintf(stderr, "ERROR: realloc failed when reallocating memory for entry in GetLine, terminating GetLine.\n");
+                    printf("ERROR: realloc failed when reallocating memory for entry in GetLine, terminating GetLine.\n");
                     return -2;
                 }
                 for (a = entrylength / 2 + 2; a < entrylength; a++) {
@@ -211,13 +218,15 @@ int GetLine(char*** row, int fd) {
             arrsize++;
             entries = (char**)realloc(entries, sizeof(char*) * arrsize);
             if (entries == NULL) {
-                fprintf(stderr, "ERROR: realloc failed\n");
+                fprintf(stderr, "ERROR: realloc failed when reallocating memory for last row in GetLine, terminating GetLine.\n");
+                printf("ERROR: realloc failed when reallocating memory for last row in GetLine, terminating GetLine.\n");
                 return -2;
             }
         }
         char* entry = (char*) malloc(sizeof(char));
         if (entry == NULL) {
-            fprintf(stderr, "ERROR: malloc failed\n");
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for last entry in GetLine, terminating GetLine.\n");
+            printf("ERROR: malloc failed when allocating memory for last entry in GetLine, terminating GetLine.\n");
             return -2;
         }
         entry[0] = '\0';
@@ -269,7 +278,8 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
             capacity *= 2;
             *Rows = (Row*)realloc(*Rows, capacity * sizeof(Row));
             if (*Rows == NULL) {
-                fprintf(stderr, "ERROR: realloc failed\n");
+                fprintf(stderr, "ERROR: realloc failed when reallocating memory for Rows in FillRows, terminating FillRows.\n");
+                printf("ERROR: realloc failed when reallocating memory for Rows in FillRows, terminating FillRows.\n");
                 return -2;
             }
             for (w = capacity / 2 + 2; w < capacity; w++) {
@@ -291,6 +301,8 @@ int SetHeader(Header* h, int fd) {
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * length);
     if (line == NULL) {
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for line in SetHeader, terminating SetHeader.\n");
+        printf("ERROR: malloc failed when allocating memory for line in SetHeader, terminating SetHeader.\n");
         return -2;
     }
     int j;
@@ -307,7 +319,8 @@ int SetHeader(Header* h, int fd) {
                 length *= 2;
                 line = (char*)realloc(line, sizeof(char) * (length + 1));
                 if (line == NULL) {
-                    fprintf(stderr, "ERROR: realloc failed\n");
+                    fprintf(stderr, "ERROR: realloc failed when reallocating memory for line in SetHeader, terminating SetHeader.\n");
+                    printf("ERROR: realloc failed when reallocating memory for line in SetHeader, terminating SetHeader.\n");
                     return -2;
                 }
                 for (j = length / 2 + 2; j < length; j++) {
@@ -337,7 +350,8 @@ int SetHeader(Header* h, int fd) {
             arrsize *= 2;
             h->titles = (char**)realloc(h->titles, sizeof(char*) * (arrsize + 1));
             if (h->titles == NULL) {
-                fprintf(stderr, "ERROR: realloc failed\n");
+                fprintf(stderr, "ERROR: realloc failed when reallocating memory for titles in SetHeader, terminating SetHeader.\n");
+                printf("ERROR: realloc failed when reallocating memory for titles in SetHeader, terminating SetHeader.\n");
                 return -1;
             }
         }
@@ -346,7 +360,8 @@ int SetHeader(Header* h, int fd) {
         size_t entrylength = 30;
         char* entry = (char*) malloc((entrylength + 1) * sizeof(char));
         if (entry == NULL) {
-            fprintf(stderr, "ERROR: malloc failed\n");
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for entry in SetHeader, terminating SetHeader.\n");
+            printf("ERROR: malloc failed when allocating memory for entry in SetHeader, terminating SetHeader.\n");
             return -1;
         }
 
@@ -381,7 +396,8 @@ int SetHeader(Header* h, int fd) {
                 entrylength *= 2;
                 entry = (char*)realloc(entry, sizeof(char) * (entrylength + 1));
                 if (entry == NULL) {
-                    fprintf(stderr, "ERROR: realloc failed\n");
+                    fprintf(stderr, "ERROR: realloc failed when reallocating memory for entry in SetHeader, terminating SetHeader.\n");
+                    printf("ERROR: realloc failed when reallocating memory for entry in SetHeader, terminating SetHeader.\n");
                     return -1;
                 }
                 for (a = entrylength / 2 + 2; a < entrylength; a++) {
@@ -405,7 +421,8 @@ char* trim(char* str) {
     int length = strlen(str);
     char * ret = (char*)malloc(sizeof(char) * (length + 1));
     if (ret == NULL) {
-        fprintf(stderr, "ERROR: malloc returned null in trim function");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory in trim, terminating trim.\n");
+        printf("ERROR: malloc failed when allocating memory in trim, terminating trim.\n");
         return str;
     }
     int j = 0;

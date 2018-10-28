@@ -4,7 +4,7 @@
  * TO-DO:
  * Correct error messages, malloc and stuff
  * free and close stuff
-*/
+ */
 
 int main(int argc, char ** argv) {
     char* inPath;
@@ -67,7 +67,8 @@ int main(int argc, char ** argv) {
         int length = strlen(dvalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
         if (name == NULL) {
-            printf("malloc failed\n");
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for inPath, terminating program.\n");
+            printf("ERROR: malloc failed when allocating memory for inPath, terminating program.\n");
             return 1;
         }
         int absolute = 0;
@@ -110,7 +111,8 @@ int main(int argc, char ** argv) {
         int length = strlen(ovalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
         if (name == NULL) {
-            printf("malloc failed\n");
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for outPath, terminating program.\n");
+            printf("ERROR: malloc failed when allocating memory for outPath, terminating program.\n");
             return 1;
         }
         int absolute = 0;

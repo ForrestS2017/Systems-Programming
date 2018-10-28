@@ -41,7 +41,8 @@ Row* merge(Row* arrows1, int length1, Row* arrows2, int length2, int index, form
 
     Row* result = (Row*)malloc(sizeof(Row) * (length1 + length2)); // Auxiliary array containing result
     if (result == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for merge result, terminating merge.\n");
+        printf("ERROR: malloc failed when allocating memory for merge result, terminating merge.\n");
         return NULL;
     }
     int lIndex = 0; // Current index in left array
