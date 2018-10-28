@@ -1,24 +1,24 @@
 #include "scannerCSVsorter.h"
 
-int Sort(int fd, int out, char* column) {
+int Sort(int inFD, int outFD, char* column) {
     // Get column titles
     Header header = { NULL, NULL };
-    header.titles = (char**) malloc(sizeof(char*) * 10);
+    header.titles = (char**)malloc(sizeof(char*) * 10);
     if (header.titles == NULL) {
         fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
+        return -1;
     }
 
     int i = 0;
-    int c = SetHeader(&header, fd); // Number of columns in table
+    int c = SetHeader(&header, inFD); // Number of columns in table
     if (c == -1) {
-        fprintf(stderr, "ERROR: No heading or columns found.\n");
-        return 0;
+        fprintf(stderr, "ERROR: No heading or columns found");
+        return -1;
     }
     header.types = (format*)malloc(sizeof(format) * c);
     if (header.types == NULL) {
         fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
+        return -1;
     }
     for (i = 0; i < c; i++) {
         header.types[i] = NUMBER;
@@ -27,18 +27,20 @@ int Sort(int fd, int out, char* column) {
     Row* rows = (Row*)malloc(sizeof(Row));
     if (rows == NULL) {
         fprintf(stderr, "ERROR: malloc failed\n");
-        return 0;
+        return -1;
     }
     rows[0].entries = NULL;
 
-    int rowcount = FillRows(&rows, &header, c, fd);
+    int rowcount = FillRows(&rows, &header, c, inFD);
    
     if (rowcount == -1) {
-        fprintf(stderr, "ERROR: Number of columns does not match the number of headings\n");
-        return 0;
+        fprintf(stderr, "ERROR: Number of columns does not match the number of headings");
+        return -1;
     } else if (rowcount == 0) {
-        fprintf(stderr, "ERROR: No records found in this file.\n");
-        return 0;
+        fprintf(stderr, "ERROR: No records found");
+        return -1;
+    } else if (rowcount == -2) {
+        return -1; // Memory allocation failure
     }
 
     int index = -1; // index of column to sort on
@@ -50,10 +52,8 @@ int Sort(int fd, int out, char* column) {
     }
 
     if (index == -1) {
-        fprintf(stderr, "ERROR: '%s' is not a column found in this file.\n");
-        return 0;
-    } else if (index == -2) {
-        return 0;
+        fprintf(stderr, "ERROR: '%s' is not a column found");
+        return -1;
     }
 
     Row* output = mergeSort(rows, rowcount, index, header.types[index]);
@@ -62,28 +62,67 @@ int Sort(int fd, int out, char* column) {
 
     int p = 0;
     for (p = 0; p < c; p++) {
-        printf("%s", header.titles[p]); // print out the top row
+        write(outFD, header.titles[p], strlen(header.titles[p])); // print out the top row
         if (p != c - 1) {
-            printf(",");
+            write(outFD, ",", 1);
         }
     }
-    printf("\n");
+    write(outFD, "\n", 1);
 
     for (i = 0; i < rowcount; i++) {
         for (p = 0; p < c; p++){
-            printf("%s", output[i].entries[p]);
+            write(outFD, output[i].entries[p], strlen(output[i].entries[p]));
             if (p != c - 1) {
-                printf(",");
+                write(outFD, ",", 1);
             }
         }
-        printf("\n");
+        write(outFD, "\n", 1);
     }
 
     free(output);
+    close(inFD);
+    close(outFD);
     return 0;
 }
 
-int fileHandler(struct dirent* file, char* column, char* inPath, char* outPath) {
+int fileHandler(struct dirent* file, char* filePath, char* column, char* ending, char* inPath, char* outPath) {
+    int n = strlen(file->d_name);   
+    if (n < 4 || strcmp(file->d_name + (n - 4), ".csv") != 0) { // Check if file ends with .csv
+        fprintf(stderr, "File '%s' is not a .csv file", filePath);
+        return 0; // Don't sort if not a .csv file
+    }
+    int p = 0;
+    if (outPath != NULL) {
+        p = strlen(outPath);
+    } else {
+        p = strlen(inPath);
+    }
+    char oPath[p + n + strlen(ending) - 4]; // [out/in]Path length + file->d_name length + ending length - length of ".csv" (ending already includes .csv so don't duplicate)
+    if (outPath != NULL) {
+        strcpy(oPath, outPath);
+    } else {
+        strcpy(oPath, inPath);
+    }
+    char fileName[n - 3]; // file name without .csv ending
+    int i;
+    for (i = 0; i < n - 4; i++) {
+        fileName[i] = file->d_name[i];
+    }
+    fileName[i] = '\0';
+    strcat(oPath, fileName);
+    strcat(oPath, ending);
+    
+    int inFD = open(filePath, O_RDONLY);
+    int outFD = open(oPath, O_RDWR | O_CREAT, 0600);
+    if (inFD == -1) {
+        fprintf(stderr, "ERROR: Could not open file '%s':\n", filePath);
+    } else if (outFD == -1) {
+        fprintf(stderr, "ERROR: Could not create file '%s':\n", oPath);
+    } else {
+        if (Sort(inFD, outFD, column) == -1) {
+            fprintf(stderr, " in file '%s'.\n", filePath);
+        }
+    }
     return 0;
 }
 
@@ -98,6 +137,10 @@ int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
     
     struct dirent * file;
     while ((file = readdir(dir)) != NULL) {
+        if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0) { // Don't run on . or ..
+            continue;
+        }
+        
         int n = strlen(file->d_name);        
         if (n > l) {
             if (strcmp(file->d_name + (n - l), ending) == 0) { // Check if file ends with -sorted-<fieldname>.csv
@@ -108,13 +151,13 @@ int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
         int m = strlen(inPath);
         char path[m + n + 2];
         strcpy(path, inPath);
-        strcat(path, file->d_name);        
+        strcat(path, file->d_name);
         
         int status;
         int pid = fork();
         if (pid == 0) {
             fprintf(stdout, "%d,", getpid());
-            if (file->d_type = DT_DIR) {
+            if (file->d_type == DT_DIR) {
                 strcat(path, "/");
                 DIR * directory = opendir(path);
                 if (directory == NULL) {
@@ -122,15 +165,12 @@ int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
                 } else {
                     directoryHandler(directory, column, path, outPath);
                 }
+            } else if (file->d_type == DT_REG) {
+                fileHandler(file, path, column, ending, inPath, outPath);
             } else {
-                int fd = open(path, O_RDONLY);
-                if (fd == -1) {
-                    fprintf(stderr, "ERROR: Could not open file '%s':\n", path);
-                } else {
-                    fileHandler(file, column, path, outPath);
-                }
+                fprintf(stderr, "ERROR: Directory entry '%s' is not a directory or a regular file\n", path);
             }
-            exit(1 + processes);
+            exit(1);
         } else {
             wait(&status);
             if (WIFEXITED(status)) {

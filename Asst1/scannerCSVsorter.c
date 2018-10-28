@@ -65,6 +65,10 @@ int main(int argc, char ** argv) {
     } else {
         int length = strlen(dvalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
+        if (name == NULL) {
+            printf("malloc failed\n");
+            return 1;
+        }
         int absolute = 0;
         name[length + 1] = 'F'; // Testing to make sure strcpy/strcat add null terminators
         if (length > 0) {
@@ -105,6 +109,10 @@ int main(int argc, char ** argv) {
     } else {
         int length = strlen(ovalue);
         char * name = (char*)malloc(sizeof(char) * (length + 4));
+        if (name == NULL) {
+            printf("malloc failed\n");
+            return 1;
+        }
         int absolute = 0;
         name[length + 1] = 'F';
         if (length > 0) {
@@ -141,33 +149,12 @@ int main(int argc, char ** argv) {
         }
     }
     
-    /*char * column = "movie_title";
-    char ending[strlen(column) + 13];
-    strcpy(ending, "-sorted-");
-    strcat(ending, column);
-    strcat(ending, ".csv");
-    int l = strlen(ending);
-    
-    char * d_name = "movie_metadata-sorted-movie_title.csv";
-    int n = strlen(d_name);        
-    if (n > l) {
-        printf("d_name: |%s|\n", d_name);
-        printf("d_name + (n - l): |%s|\n", d_name + (n - l));
-        printf("ending: |%s|\n", ending);
-        if (strcmp(d_name + (n - l), ending) == 0) { // Check if file ends with -sorted-<fieldname>.csv
-            printf("HI\n");
-        } else {
-            printf("BYE\n");
-        }
-    }
-    
-    return 0;*/
-    
     // Print required metadata
     int pid = getpid();
     fprintf(stdout, "Initial PID: %d\n", pid);
     
     fprintf(stdout, "PIDS of all child processes: ");
+    fflush(stdout);
     
     int processes = directoryHandler(inDir, colname, inPath, outPath);
     
@@ -175,7 +162,15 @@ int main(int argc, char ** argv) {
     fprintf(stdout, "Total number of processes: %d\n", processes);
     
     closedir(inDir);
-    closedir(outDir);
+    if (outDir != NULL) {
+        closedir(outDir);
+    }
+    if (inPath != NULL) {
+        free(inPath);
+    }
+    if (outPath != NULL) {
+        free(outPath);
+    }
 
     return 0;
 }

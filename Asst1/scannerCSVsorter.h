@@ -59,7 +59,7 @@ format getType(char* str);
 
 int Sort(int, int, char*);
 
-int fileHandler(struct dirent*, char*, char*, char*);
+int fileHandler(struct dirent*, char*, char*, char*, char*, char*);
 
 int directoryHandler(DIR*, char*, char*, char*);
 
