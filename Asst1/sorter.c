@@ -183,6 +183,8 @@ int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
         strcpy(path, inPath);
         strcat(path, file->d_name);
         
+        fprintf(stderr, "path: %s\n", path);
+        
         int status;
         int pid = fork(); // fork on this dir entry
         if (pid == 0) { // child
