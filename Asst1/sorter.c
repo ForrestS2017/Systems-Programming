@@ -12,7 +12,8 @@ int Sort(int inFD, int outFD, char* column) {
     Header header = { NULL, NULL };
     header.titles = (char**)malloc(sizeof(char*) * 10);
     if (header.titles == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
+        printf("ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
         return -1;
     }
 
@@ -24,7 +25,8 @@ int Sort(int inFD, int outFD, char* column) {
     }
     header.types = (format*)malloc(sizeof(format) * c);
     if (header.types == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for header.types in Sort, terminating Sort.\n");
+        printf("ERROR: malloc failed when allocating memory for header.types in Sort, terminating Sort.\n");
         return -1;
     }
     for (i = 0; i < c; i++) {
@@ -33,7 +35,8 @@ int Sort(int inFD, int outFD, char* column) {
 
     Row* rows = (Row*)malloc(sizeof(Row));
     if (rows == NULL) {
-        fprintf(stderr, "ERROR: malloc failed\n");
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for rows in Sort, terminating Sort.\n");
+        printf("ERROR: malloc failed when allocating memory for rows in Sort, terminating Sort.\n");
         return -1;
     }
     rows[0].entries = NULL;
