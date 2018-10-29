@@ -25,6 +25,7 @@ int Sort(char* filePath, char* oPath, char* column) {
 
     int i = 0;
     int c = SetHeader(&header, inFD); // Number of columns in table
+    fprintf(stderr, "HEADER COLUMNS: %d\n", c);
     if (c == -1) {
         fprintf(stderr, "ERROR: No heading or columns found in file '%s'.\n", filePath);
         return -1;

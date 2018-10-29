@@ -204,7 +204,7 @@ int GetLine(char*** row, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for entry in GetLine, terminating GetLine.\n");
                     return -2;
                 }
-                for (a = entrylength / 2 + 2; a < entrylength; a++) {
+                for (a = entrylength / 2 + 1; a < entrylength; a++) {
                     entry[a] = '\0';
                 }
             }
@@ -259,6 +259,7 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
         }
         
         if (c != columns) {
+            fprintf(stderr, "ROW COLUMNS: %d\n", c);
             if (c == -2) {
                 return -2; // For malloc/realloc failure
             } else {
@@ -400,11 +401,32 @@ int SetHeader(Header* h, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for entry in SetHeader, terminating SetHeader.\n");
                     return -1;
                 }
-                for (a = entrylength / 2 + 2; a < entrylength; a++) {
+                for (a = entrylength / 2 + 1; a < entrylength; a++) {
                     entry[a] = '\0';
                 }
             }
         }
+        h->titles[position] = entry;
+        position++;
+    }
+
+    if (line[linepos - 1] == ',') { // last column is null
+        if (position >= arrsize) {
+            arrsize++;
+            h->titles = (char**)realloc(h->titles, sizeof(char*) * arrsize);
+            if (h->titles == NULL) {
+                fprintf(stderr, "ERROR: realloc failed when reallocating memory for last title column in SetHeader, terminating SetHeader.\n");
+                printf("ERROR: realloc failed when reallocating memory for last title column in SetHeader, terminating SetHeader.\n");
+                return -2;
+            }
+        }
+        char* entry = (char*) malloc(sizeof(char));
+        if (entry == NULL) {
+            fprintf(stderr, "ERROR: malloc failed when allocating memory for last entry in SetHeader, terminating SetHeader.\n");
+            printf("ERROR: malloc failed when allocating memory for last entry in SetHeader, terminating SetHeader.\n");
+            return -2;
+        }
+        entry[0] = '\0';
         h->titles[position] = entry;
         position++;
     }
