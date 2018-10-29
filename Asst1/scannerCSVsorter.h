@@ -59,7 +59,7 @@ int SetHeader(Header*, int);
 format getType(char* str);
 
 // Sorts a file
-int Sort(int, int, char*);
+int Sort(char*, char*, char*);
 
 // Handles operations on files
 int fileHandler(struct dirent*, char*, char*, char*, char*);

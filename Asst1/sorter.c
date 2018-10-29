@@ -2,12 +2,18 @@
 
 /**
  * Sorts a given file and outputs result in another file
- * @param inFD File descriptor for file to be sorted
- * @param outFD File descriptor for file to output to
+ * @param filePath Path for file to be sorted
+ * @param oPath Path for the file to output to
  * @param column Name of column to be sorted on
  * @return 0 if successful, -1 if error occurred
  */
-int Sort(int inFD, int outFD, char* column) {
+int Sort(char* filePath, char* oPath, char* column) {
+    int inFD = open(filePath, O_RDONLY);
+    if (inFD == -1) {
+        fprintf(stderr, "ERROR: Could not open file '%s'.\n", filePath);
+        return -1;
+    }
+    
     // Get column titles
     Header header = { NULL, NULL };
     header.titles = (char**)malloc(sizeof(char*) * 10);
@@ -20,7 +26,7 @@ int Sort(int inFD, int outFD, char* column) {
     int i = 0;
     int c = SetHeader(&header, inFD); // Number of columns in table
     if (c == -1) {
-        fprintf(stderr, "ERROR: No heading or columns found");
+        fprintf(stderr, "ERROR: No heading or columns found in file '%s'.\n", filePath);
         return -1;
     }
     header.types = (format*)malloc(sizeof(format) * c);
@@ -44,10 +50,10 @@ int Sort(int inFD, int outFD, char* column) {
     int rowcount = FillRows(&rows, &header, c, inFD); // Fill in row data
    
     if (rowcount == -1) {
-        fprintf(stderr, "ERROR: Number of columns does not match the number of headings");
+        fprintf(stderr, "ERROR: Number of columns does not match the number of headings in file '%s'.\n", filePath);
         return -1;
     } else if (rowcount == 0) {
-        fprintf(stderr, "ERROR: No records found");
+        fprintf(stderr, "ERROR: No records found in file '%s'.\n", filePath);
         return -1;
     } else if (rowcount == -2) {
         return -1; // Memory allocation failure
@@ -62,7 +68,13 @@ int Sort(int inFD, int outFD, char* column) {
     }
 
     if (index == -1) {
-        fprintf(stderr, "ERROR: '%s' is not a column found", column);
+        fprintf(stderr, "ERROR: '%s' is not a column found in file '%s'.\n", column, filePath);
+        return -1;
+    }
+    
+    int outFD = open(oPath, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
+    if (outFD == -1) {
+        fprintf(stderr, "ERROR: Could not create file '%s'.\n", oPath);
         return -1;
     }
 
@@ -146,17 +158,8 @@ int fileHandler(struct dirent* file, char* filePath, char* column, char* inPath,
     strcat(oPath, fileName);
     strcat(oPath, ending);
     
-    int inFD = open(filePath, O_RDONLY);
-    int outFD = open(oPath, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
-    if (inFD == -1) {
-        fprintf(stderr, "ERROR: Could not open file '%s'.\n", filePath);
-    } else if (outFD == -1) {
-        fprintf(stderr, "ERROR: Could not create file '%s'.\n", oPath);
-    } else {
-        if (Sort(inFD, outFD, column) == -1) { // Call sort, if return value is -1, error occurred so print out which file the error occurred in
-            fprintf(stderr, " in file '%s'.\n", filePath);
-        }
-    }
+    Sort(filePath, oPath, column);
+    
     return 0;
 }
 
@@ -182,8 +185,6 @@ int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
         char path[m + n + 2]; // Get full path to current file
         strcpy(path, inPath);
         strcat(path, file->d_name);
-        
-        fprintf(stderr, "path: %s\n", path);
         
         int status;
         int pid = fork(); // fork on this dir entry

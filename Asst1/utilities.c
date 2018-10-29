@@ -96,7 +96,7 @@ int GetIndex(char** source, char* target) {
 int GetLine(char*** row, int fd) {
     int length = 8;
     int count = 0;
-    char * line = (char*)malloc(sizeof(char) * length);
+    char * line = (char*)malloc(sizeof(char) * (length + 1));
     if (line == NULL) {
         fprintf(stderr, "ERROR: malloc failed when allocating memory for line in GetLine, terminating GetLine.\n");
         printf("ERROR: malloc failed when allocating memory for line in GetLine, terminating GetLine.\n");
@@ -120,7 +120,7 @@ int GetLine(char*** row, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for line in GetLine, terminating GetLine.\n");
                     return -2;
                 }
-                for (j = length / 2 + 2; j < length; j++) {
+                for (j = length / 2 + 1; j < length; j++) {
                     line[j] = '\0';
                 }
            }
@@ -299,7 +299,7 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
 int SetHeader(Header* h, int fd) {
     int length = 8;
     int count = 0;
-    char * line = (char*)malloc(sizeof(char) * length);
+    char * line = (char*)malloc(sizeof(char) * (length + 1));
     if (line == NULL) {
         fprintf(stderr, "ERROR: malloc failed when allocating memory for line in SetHeader, terminating SetHeader.\n");
         printf("ERROR: malloc failed when allocating memory for line in SetHeader, terminating SetHeader.\n");
@@ -323,7 +323,7 @@ int SetHeader(Header* h, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for line in SetHeader, terminating SetHeader.\n");
                     return -2;
                 }
-                for (j = length / 2 + 2; j < length; j++) {
+                for (j = length / 2 + 1; j < length; j++) {
                     line[j] = '\0';
                 }
            }
