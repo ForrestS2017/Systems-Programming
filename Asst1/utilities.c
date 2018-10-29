@@ -103,7 +103,7 @@ int GetLine(char*** row, int fd) {
         return -2;
     }
     int j;
-    for (j = 0; j < length; j++) {
+    for (j = 0; j < length + 1; j++) {
         line[j] = '\0';
     }
     int b; // number of bytes read by read
@@ -120,7 +120,7 @@ int GetLine(char*** row, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for line in GetLine, terminating GetLine.\n");
                     return -2;
                 }
-                for (j = length / 2 + 1; j < length; j++) {
+                for (j = length / 2 + 1; j < length + 1; j++) {
                     line[j] = '\0';
                 }
            }
@@ -259,7 +259,6 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
         }
         
         if (c != columns) {
-            fprintf(stderr, "ROW COLUMNS: %d\n", c);
             if (c == -2) {
                 return -2; // For malloc/realloc failure
             } else {
@@ -307,7 +306,7 @@ int SetHeader(Header* h, int fd) {
         return -2;
     }
     int j;
-    for (j = 0; j < length; j++) {
+    for (j = 0; j < length + 1; j++) {
         line[j] = '\0';
     }
     int b; // number of bytes read by read
@@ -324,7 +323,7 @@ int SetHeader(Header* h, int fd) {
                     printf("ERROR: realloc failed when reallocating memory for line in SetHeader, terminating SetHeader.\n");
                     return -2;
                 }
-                for (j = length / 2 + 1; j < length; j++) {
+                for (j = length / 2 + 1; j < length + 1; j++) {
                     line[j] = '\0';
                 }
            }
