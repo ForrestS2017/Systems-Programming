@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <ctime.h>
+#include <time.h>
 
 #ifndef MULTITHREADSORTER_H_
 #define MULTITHREADSORTER_H_
