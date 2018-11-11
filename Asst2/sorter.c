@@ -1,4 +1,4 @@
-#include "scannerCSVsorter.h"
+#include "multiThreadSorter.h"
 
 /**
  * Sorts a given file and outputs result in another file

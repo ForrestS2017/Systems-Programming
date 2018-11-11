@@ -6,9 +6,10 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <ctime.h>
 
-#ifndef SCANNERCSVSORTER_H_
-#define SCANNERCSVSORTER_H_
+#ifndef MULTITHREADSORTER_H_
+#define MULTITHREADSORTER_H_
 
 /***** Variables, Structs *****/
 

@@ -1,4 +1,4 @@
-#include "scannerCSVsorter.h"
+#include "multiThreadSorter.h"
 
 /**
 * Calls getline() and returns the line parsed into a char** array where delimiter = ','

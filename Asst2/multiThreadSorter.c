@@ -1,4 +1,4 @@
-#include "scannerCSVsorter.h"
+#include "multiThreadSorter.h"
 
 /**
  * TO-DO:
