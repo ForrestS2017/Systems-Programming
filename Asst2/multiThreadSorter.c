@@ -6,17 +6,22 @@
  */
 
 int main(int argc, char ** argv) {
+    // Directory global variables
     char* inPath;
     char* outPath;
     char* colname;
     DIR* inDir;
     DIR* outDir;
 
+    // Argument global variables
     char * cvalue = NULL;
     char * dvalue = NULL;
     char * ovalue = NULL;
     int a;
     opterr = 0; // Suppress errors from getopt
+
+    // Thread global variables
+    int tid;
     
     // Parse command line arguments with getopt
     while ((a = getopt(argc, argv, "c:d:o:")) != -1) {
@@ -149,17 +154,19 @@ int main(int argc, char ** argv) {
         }
     }
 
-    // Print required metadata
-    int pid = getpid();
-    fprintf(stdout, "Initial PID: %d\n", pid);
+    /***   Begin Sorting   ***/
 
-    fprintf(stdout, "PIDS of all child processes: "); // No newline, PIDs will be outputed to stdout by other processes
+    // Print required metadata
+    tid = 1;    // Initial directory TID
+    fprintf(stdout, "Initial TID: %d\n", tid);
+
+    fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
     fflush(stdout); // Make sure to fflush stdout so printing errors don't occur
 
     int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
 
     fprintf(stdout, "\n");
-    fprintf(stdout, "Total number of processes: %d\n", processes);
+    fprintf(stdout, "Total number of threads: %d\n", processes);
 
     // Close dirs and free stuff
     closedir(inDir);
