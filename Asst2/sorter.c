@@ -171,8 +171,13 @@ int fileHandler(struct dirent* file, char* filePath, char* column, char* inPath,
  * @param outPath Path to output directory
  * @return number of child processes
  */
-int directoryHandler(DIR* dir, char* column, char* inPath, char* outPath) {
+int directoryHandler(TArguments * tArgs) {
     int processes = 0;
+    
+    DIR* dir = tArgs->dir;
+    char * inPath = tArgs->inPath;
+    char * outPath = tArgs->outPath;
+    char * colname = tArgs->colname;
     
     struct dirent * file;
     while ((file = readdir(dir)) != NULL) { // Loop through directory
