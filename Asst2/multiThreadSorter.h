@@ -34,12 +34,31 @@ typedef struct _Row
 
 typedef struct _TArguments
 {
+    struct dirent* file;
     DIR * dir;
-    char * colname;
+    char* filePath;
+    char * column;
     char * outPath;
     char * inPath; // DIR* dir, char* column, char* inPath, char* outPath
 } TArguments;
 
+// Directory global variables
+    char *inPath;
+    char *outPath;
+    char *colname;
+    DIR *inDir;
+    DIR *outDir;
+    Row* sortRows; 
+    char * sortHeaders[27];
+
+// Countable variables
+int totalTIDs;
+int totalCols = 27;
+int totalRows = 0;
+
+// Mutex locks 
+pthread_mutex_t _fileLock;
+pthread_mutex_t _printLock;
 /***** Functions *****/
 
 // Compares two strings
@@ -55,7 +74,7 @@ char *trim(char *);
 Row *merge(Row *, int, Row *, int, int, format);
 
 // Sorts an array of Rows using merge sort
-Row *mergeSort(Row *, int, int, format);
+Row *mergeAppendRows(Row *, int, int, format);
 
 // Checks for valid arguments
 int CheckInput(int, char **);
@@ -76,10 +95,10 @@ int SetHeader(Header *, int);
 format getType(char *str);
 
 // Sorts a file
-int Sort(char *, char *, char *);
+int AppendRows(char *, char *, char *);
 
 // Handles operations on files
-int fileHandler(struct dirent *, char *, char *, char *, char *);
+int fileHandler(TArguments *);
 
 // Handles operations on directories
 int directoryHandler(TArguments *);

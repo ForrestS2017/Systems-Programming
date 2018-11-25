@@ -7,12 +7,6 @@
 
 int main(int argc, char **argv)
 {
-    // Directory global variables
-    char *inPath;
-    char *outPath;
-    char *colname;
-    DIR *inDir;
-    DIR *outDir;
 
     // Argument global variables
     char *cvalue = NULL;
@@ -202,7 +196,7 @@ int main(int argc, char **argv)
     }
 
     /***   Begin Sorting   ***/
-
+    
     // Print required metadata
     tid = 1; // Initial directory TID
     fprintf(stdout, "Initial TID: %d\n", tid);
@@ -214,7 +208,7 @@ int main(int argc, char **argv)
     args->dir = inDir;
     args->inPath = inPath;
     args->outPath = outPath;
-    args->colname = colname;
+    args->column = colname;
 
     pthread_t thread;
     int threads = pthread_create(&thread, NULL, directoryHandler, args);
@@ -227,11 +221,77 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    totalTIDs = 1;
     fprintf(stdout, "\n");
     fprintf(stdout, "Total number of threads: %d\n", threads);
 
+    // Check if threads failed to join
+    void* joinStatus;
+    pthread_join(thread, &joinStatus);
+    fprintf(stderr, "ERROR: Could join threads.\n");
+    if ((int)(intptr_t) joinStatus < 0) return -1;
+
+    // Mergesort all rows
+
+    Row* output = mergeSort(sortRows, totalRows, index, colname); // Call mergeSort (from mergesort.c)
+    char* outFD[1];
+    strcpy(outFD,outPath);
+    strcpy(outFD, "AllFiles-sorted-");
+    strcat(outFD, colname);
+    strcat(outFD, ".csv");
+
+    sortHeaders[0] = "color";
+    sortHeaders[1] = "director_name";
+    sortHeaders[2] = "num_critic_for_reviews";
+    sortHeaders[3] = "duration";
+    sortHeaders[4] = "director_facebook_likes";
+    sortHeaders[5] = "actor_3_facebook_likes";
+    sortHeaders[6] = "actor_2_name";
+    sortHeaders[7] = "actor_1_facebook_likes";
+    sortHeaders[8] = "gross";
+    sortHeaders[9] = "genres";
+    sortHeaders[10] = "actor_1_name";
+    sortHeaders[11] = "movie_title";
+    sortHeaders[12] = "num_voted_users";
+    sortHeaders[13] = "cast_total_facebook_likes";
+    sortHeaders[14] = "actor_3_name";
+    sortHeaders[15] = "facenumber_in_poster";
+    sortHeaders[16] = "plot_keywords";
+    sortHeaders[17] = "movie_imdb_link";
+    sortHeaders[18] = "num_user_for_reviews";
+    sortHeaders[19] = "language";
+    sortHeaders[20] = "country";
+    sortHeaders[21] = "content_rating";
+    sortHeaders[22] = "budget";
+    sortHeaders[23] = "title_year";
+    sortHeaders[24] = "actor_2_facebook_likes";
+    sortHeaders[25] = "imdb_score";
+    sortHeaders[26] = "aspect_ratio";
+    sortHeaders[27] = "movie_facebook_likes";
+
+    int p = 0;
+    int i = 0;
+    for (p = 0; p < totalCols; p++) {
+        write(outFD, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
+        if (p !=  - 1) {
+            write(outFD, ",", 1);
+        }
+    }
+    write(outFD, "\n", 1);
+
+    for (i = 0; i < totalRows; i++) {
+        for (p = 0; p < totalCols; p++){
+            write(outFD, output[i].entries[p], strlen(output[i].entries[p])); // write row to output file
+            if (p != totalCols - 1) {
+                write(outFD, ",", 1);
+            }
+        }
+        write(outFD, "\n", 1);
+    }
+
     // Close dirs and free stuff
     closedir(inDir);
+    close(outFD);
     if (outDir != NULL)
     {
         closedir(outDir);

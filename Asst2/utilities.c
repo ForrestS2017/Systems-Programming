@@ -246,7 +246,7 @@ int GetLine(char*** row, int fd) {
 * @return number of rows
 */
 int FillRows(Row** Rows, Header* header, int columns, int fd) {
-    int rows = 0;
+    int rows = totalRows;
     int capacity = 1;
     int w = 0;
 
@@ -255,7 +255,7 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
         int c = GetLine(&entries, fd);
         
         if (entries == NULL) {
-            return rows;
+            return 0;
         }
         
         if (c != columns) {
@@ -287,6 +287,7 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
             }
         }
     }
+    totalRows = rows;
     return rows;
 }
 
@@ -297,6 +298,9 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
 */
 
 int SetHeader(Header* h, int fd) {
+
+    // Malloc default space to be re-allocated
+
     int length = 8;
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * (length + 1));
@@ -309,6 +313,8 @@ int SetHeader(Header* h, int fd) {
     for (j = 0; j < length + 1; j++) {
         line[j] = '\0';
     }
+
+    // Read the entire line byte by byte
     int b; // number of bytes read by read
     char c = '\0';
     while ((b = read(fd, &c, 1)) > 0) {
@@ -332,6 +338,7 @@ int SetHeader(Header* h, int fd) {
         }
     }
     
+    // Reached the end inappropriately
     if (b == -1 || strcmp(line, "") == 0) {
         return -1;
     }
@@ -343,7 +350,8 @@ int SetHeader(Header* h, int fd) {
     size_t i = 0;
     size_t linepos = 0;
     size_t linelength = strlen(line);
-
+    
+    // Prepping array size and string size for header array
     while (linepos < linelength) {
 
         if (position >= arrsize) {
@@ -369,7 +377,8 @@ int SetHeader(Header* h, int fd) {
         for (a = 0; a < entrylength; a++) {
             entry[a] = '\0';
         }
-
+        
+        int hCount = 27;    // Ensure we are 
         while (linepos < linelength) {
             char c = line[linepos];
 
