@@ -200,9 +200,7 @@ int main(int argc, char **argv)
     // Print required metadata
     tid = 1; // Initial directory TID
     fprintf(stdout, "Initial TID: %d\n", tid);
-
-    fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
-    fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
+    fflush(stdout);
 
     TArguments *args = (TArguments *)mallo(sizeof(TArguments));
     args->dir = inDir;
@@ -222,6 +220,13 @@ int main(int argc, char **argv)
     }
 
     totalTIDs = 1;
+
+    fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
+    for(tid = tid; tid <= totalTIDs; tid++){
+        fprintf(stdout, ", %d", tid);
+    }
+    fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
+
     fprintf(stdout, "\n");
     fprintf(stdout, "Total number of threads: %d\n", threads);
 
