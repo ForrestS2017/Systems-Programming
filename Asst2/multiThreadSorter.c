@@ -202,24 +202,25 @@ int main(int argc, char **argv)
     fprintf(stdout, "Initial TID: %d\n", tid);
     fflush(stdout);
 
-    TArguments *args = (TArguments *)mallo(sizeof(TArguments));
+    TArguments *args = (TArguments *)malloc(sizeof(TArguments));
     args->dir = inDir;
     args->inPath = inPath;
     args->outPath = outPath;
     args->column = colname;
 
     pthread_t thread;
-    int threads = pthread_create(&thread, NULL, directoryHandler, args);
+    totalTIDs = 1;
+    int success = pthread_create(&thread, NULL, directoryHandler, args);
     //int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
 
     // Abort if thread failed to create
-    if (!threads)
+    if (!success)
     {
         fprintf(stderr, "ERROR: Could not create main thread\n");
         return -1;
     }
 
-    totalTIDs = 1;
+    
 
     fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
     for(tid = tid; tid <= totalTIDs; tid++){
@@ -228,7 +229,7 @@ int main(int argc, char **argv)
     fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
 
     fprintf(stdout, "\n");
-    fprintf(stdout, "Total number of threads: %d\n", threads);
+    fprintf(stdout, "Total number of threads: %d\n", totalTIDs);
 
     // Check if threads failed to join
     void* joinStatus;
@@ -238,8 +239,8 @@ int main(int argc, char **argv)
 
     // Mergesort all rows
 
-    Row* output = mergeSort(sortRows, totalRows, index, colname); // Call mergeSort (from mergesort.c)
-    char* outFD[1];
+    // Call mergeSort (from mergesort.c)
+    char outFD[1];
     strcpy(outFD,outPath);
     strcpy(outFD, "AllFiles-sorted-");
     strcat(outFD, colname);
@@ -276,27 +277,34 @@ int main(int argc, char **argv)
 
     int p = 0;
     int i = 0;
+
+    int oPath = open(outFD, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
+    if (outFD < 0) {
+        fprintf(stderr, "ERROR: Could not create file '%s'.\n", outFD);
+        return -1;
+    }
+
     for (p = 0; p < totalCols; p++) {
-        write(outFD, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
+        write(oPath, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
         if (p !=  - 1) {
-            write(outFD, ",", 1);
+            write(oPath, ",", 1);
         }
     }
-    write(outFD, "\n", 1);
+    write(oPath, "\n", 1);
 
     for (i = 0; i < totalRows; i++) {
         for (p = 0; p < totalCols; p++){
-            write(outFD, output[i].entries[p], strlen(output[i].entries[p])); // write row to output file
+            write(oPath, output[i].entries[p], strlen(output[i].entries[p])); // write row to output file
             if (p != totalCols - 1) {
-                write(outFD, ",", 1);
+                write(oPath, ",", 1);
             }
         }
-        write(outFD, "\n", 1);
+        write(oPath, "\n", 1);
     }
 
     // Close dirs and free stuff
     closedir(inDir);
-    close(outFD);
+    close(oPath);
     if (outDir != NULL)
     {
         closedir(outDir);
@@ -312,3 +320,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+

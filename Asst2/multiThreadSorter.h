@@ -48,13 +48,18 @@ typedef struct _TArguments
     char *colname;
     DIR *inDir;
     DIR *outDir;
-    Row* sortRows; 
-    char * sortHeaders[27];
+    Row* sortRows;
+    Row* output;
+
+    char * sortHeaders[28];
+
+    format types[] = {STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, STRING, NUMBER, STRING, STRING, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER};
 
 // Countable variables
 int totalTIDs;
 int totalCols = 27;
 int totalRows = 0;
+int sortIndex = -1;
 
 // Mutex locks 
 pthread_mutex_t _fileLock;
@@ -98,9 +103,9 @@ format getType(char *str);
 int AppendRows(char *, char *, char *);
 
 // Handles operations on files
-int fileHandler(TArguments *);
+void * fileHandler(void *);
 
 // Handles operations on directories
-int directoryHandler(TArguments *);
+void * directoryHandler(void *);
 
 #endif /* SIMPLECSVSORTER_H_ */

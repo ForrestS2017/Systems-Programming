@@ -51,6 +51,8 @@ int AppendRows(char* filePath, char* oPath, char* column) {
     if (index == -1) {
         fprintf(stderr, "ERROR: '%s' is not a column found in file '%s'.\n", column, filePath);
         return -1;
+    } else {
+        sortIndex = index;
     }
 
     if(sortRows == NULL) {
@@ -64,7 +66,7 @@ int AppendRows(char* filePath, char* oPath, char* column) {
     }
     
 
-    int rowcount = FillRows(sortRows, &header, c, inFD); // Fill in row data
+    int rowcount = FillRows(&sortRows, &header, c, inFD); // Fill in row data
    
     if (rowcount == -1) {
         fprintf(stderr, "ERROR: Number of columns does not match the number of headings in file '%s'.\n", filePath);
@@ -126,8 +128,8 @@ int AppendRows(char* filePath, char* oPath, char* column) {
  * @param outPath Path to output directory
  * @return number of child processes
  */
-int fileHandler(TArguments* tArgs) {
-    
+void * fileHandler(void* args) {
+    TArguments * tArgs = args;
     struct dirent * file = tArgs->file;
     char * filePath = tArgs->filePath;
     char * inPath = tArgs->inPath;
@@ -148,7 +150,7 @@ int fileHandler(TArguments* tArgs) {
     // }    
     if (n < 4 || strcmp(file->d_name + (n - 4), ".csv") != 0) { // Check if file ends with .csv
         fprintf(stderr, "File '%s' is not a .csv file\n", filePath);
-        return 0; // Don't sort if not a .csv file
+        return (void*)(size_t)  0; // Don't sort if not a .csv file
     }
     int p = 0; // Length of path to output directory
     if (outPath != NULL) {
@@ -177,7 +179,7 @@ int fileHandler(TArguments* tArgs) {
     
     AppendRows(filePath, oPath, column);
     
-    return 0;
+    return (void*) (size_t) 0;
 }
 
 /**
@@ -188,7 +190,8 @@ int fileHandler(TArguments* tArgs) {
  * @param outPath Path to output directory
  * @return number of child processes
  */
-int directoryHandler(TArguments * tArgs) {
+void * directoryHandler(void* args) {
+    TArguments * tArgs = args;
     int threads = 0;
     
     DIR* dir = tArgs->dir;
@@ -221,39 +224,41 @@ int directoryHandler(TArguments * tArgs) {
                     fprintf(stderr, "ERROR: Could not open directory '%s'\n", path);
                     exit(1);
                 } else {
-                    TArguments * nextArgs = (TArguments *)mallo(sizeof(TArguments));
+                    TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
                     nextArgs->dir = directory;
                     nextArgs->inPath = inPath;
                     nextArgs->outPath = outPath;
                     nextArgs->column = column;
                     pthread_t thread;
                     
-                    threads += 1 + pthread_create(&thread, NULL, directoryHandler, nextArgs); // Create thread for next subdirectory
+                    pthread_create(&thread, NULL, directoryHandler, nextArgs); // Create thread for next subdirectory
                     void* joinStatus;
                     pthread_join(thread, &joinStatus);
                     fprintf(stderr, "ERROR: Could join threads.\n");
-                    if ((int)(intptr_t) joinStatus < 0) return -1;
-
-                    exit(threads); // Exit with the number of children
+                    if ((int)(intptr_t) joinStatus < 0) return (void*)(size_t)  -1;
+                    totalTIDs += 1;
+                    threads++;
+                    return (void*) (size_t) threads; // Exit with the number of children
                 }
             } else if (file->d_type == DT_REG) { // If dir entry is a regular file
-                TArguments * nextArgs = (TArguments *)mallo(sizeof(TArguments));
+                TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
                 nextArgs->file = file;
                 nextArgs->filePath = path;
                 nextArgs->inPath = inPath;
                 nextArgs->outPath = outPath;
                 nextArgs->column = column;
 
-                pthread_t thread;
-                threads += 1 + pthread_create(&thread, NULL, fileHandler, nextArgs); // Create thread for next file via file handler on the file
+                pthread_t thread;pthread_create(&thread, NULL, fileHandler, nextArgs); // Create thread for next file via file handler on the file
                 void* joinStatus;
                 pthread_join(thread, &joinStatus);
                 fprintf(stderr, "ERROR: Could join threads.\n");
-                if ((int)(intptr_t) joinStatus < 0) return -1;
+                if ((int)(intptr_t) joinStatus < 0) return (void*) (size_t) -1;
+                totalTIDs += 1;
+                threads++;
                 exit(1); // Exit with 1 to indicate 1 process
             } else {
                 fprintf(stderr, "ERROR: Directory entry '%s' is not a directory or a regular file\n", path);
-                exit(1);
+                return (void*)(size_t) threads;
             }
         } else { // parent
             wait(&status); // Wait for child to finish
@@ -263,5 +268,7 @@ int directoryHandler(TArguments * tArgs) {
         }
     }
     
-    return threads;
+    output = mergeSort(sortRows, totalRows, sortIndex, types[sortIndex]);
+
+    return (void*) (size_t) threads;
 }
