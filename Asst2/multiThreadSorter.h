@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <pthread.h>
-#include <time.h>
+#include <semaphore.h>
 
 #ifndef MULTITHREADSORTER_H_
 #define MULTITHREADSORTER_H_
@@ -43,21 +43,25 @@ typedef struct _TArguments
 } TArguments;
 
 // Directory global variables
-    char *inPath;
-    char *outPath;
-    char *colname;
-    DIR *inDir;
-    DIR *outDir;
-    Row* sortRows;
-    Row* output;
+char *inPath;
+char *outPath;
+char *colname;
+DIR *inDir;
+DIR *outDir;
+Row* sortRows;
+Row* output;
+Row** ALL_DATA;
+int* ALL_DATA_COUNT;
+int* ALL_DATA_MAX;
+int* ALL_DATA_ROW_COUNT;
 
-    char * sortHeaders[28];
+char * sortHeaders[28]; // probably want to be const to make this work best
 
-    format types[] = {STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, STRING, NUMBER, STRING, STRING, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER};
+format types[] = { STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, STRING, NUMBER, STRING, STRING, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER };
 
 // Countable variables
 int totalTIDs;
-int totalCols = 27;
+int totalCols = 28;
 int totalRows = 0;
 int sortIndex = -1;
 
@@ -79,7 +83,7 @@ char *trim(char *);
 Row *merge(Row *, int, Row *, int, int, format);
 
 // Sorts an array of Rows using merge sort
-Row *mergeAppendRows(Row *, int, int, format);
+Row *mergeSort(Row *, int, int, format);
 
 // Checks for valid arguments
 int CheckInput(int, char **);
@@ -100,7 +104,7 @@ int SetHeader(Header *, int);
 format getType(char *str);
 
 // Sorts a file
-int AppendRows(char *, char *, char *);
+int Sort(char *, char *, char *);
 
 // Handles operations on files
 void * fileHandler(void *);

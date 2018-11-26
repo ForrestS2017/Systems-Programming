@@ -1,72 +1,6 @@
 #include "multiThreadSorter.h"
 
 /**
-* Calls getline() and returns the line parsed into a char** array where delimiter = ','
-* @param argc Number of arguments
-* @param argv String array of arguments
-* @return -1 if any fatal errors, otherwise 1 upon success
-*/
-/*int CheckInput(int argc, char** argv) {
-    // Check for correct argument count
-    if (argc != 3 && argc != 5 && argc != 7) { // terrible way to do this, we need to fix it later
-        fprintf(stderr, "ERROR: Incorrect number of arguments. Correct usage is ./scannerCSVsorter <sortBy> <columnName> [-d <input-directory>] [-o <output-directory>]\nExample:./simpleCSVsorter -c food\n");
-        return 0; // No idea what I'm supposed to be returning
-    }
-
-    // Check if user is using proper arguments by iterating over two args at a time
-    int argpos = 1, errors = 0;
-    int flags[3] = {0,0,0};
-
-    for (argpos = 1; argpos < argc; argpos++) {
-        if (strcmp(argv[argpos], "-c") == 0) { // this causes segfault, we can't access argv
-            strcpy(argv[argpos + 1], colname);
-            flags[0]++;
-        } else if (strcmp(argv[argpos], "-d") == 0) {
-            strcpy(argv[argpos + 1],inPath);
-            inDir = opendir(inPath);
-            flags[1]++;
-        } else if (strcmp(argv[argpos], "-o") == 0) {
-            strcpy(argv[argpos + 1],outPath);
-            outDir = opendir(outPath);
-            flags[2]++;
-        } else {
-            fprintf(stderr, "ERROR: Invalid flag. Only use -c, -d, or -o\n");
-            return 0; // idk
-        }
-    }
-
-    // Handle missing -c, -d, and -o flags
-
-    if(flags[0] != 1) {
-        fprintf(stderr, "ERROR: Missing/ambiguous column to sort by. Please enter the column name after -c\n");
-        return 0; // idk
-    }
-    if(flags[1] < 1) {
-        inPath = ".";
-        inDir = opendir(inPath);
-    }
-    if(flags[2] < 1) { // nope, this is wrong
-        outPath = ".";
-        outDir = opendir(outPath);
-    }
-
-    // Handle too many -d or -o flags
-
-    if(flags[1] > 1 || flags[2] > 1) {
-        fprintf(stderr, "ERROR: Too many targeted directories. Limit to one input and one output directory.\n");
-        return 0; // idk
-    }
-
-    // Handle non-existent directory
-
-    if(!(inDir || outDir)) {
-        fprintf(stderr, "ERROR: Directory not found. Missing directories will not be created.\n");
-        return 0; // idk
-    }
-    return 1; // what
-}*/
-
-/**
 * Gets the index of an entry in a row (used for target column index)
 * @param source String array of cells (from row or header)
 * @param target Target String
@@ -89,11 +23,11 @@ int GetIndex(char** source, char* target) {
 }
 
 /**
-* Calls getline() and sets row to entries where the line parsed into a char** array where delimiter = ','
+* Calls read() and sets row to entries where the line parsed into a char** array where delimiter = ','
   @param row Destination of row entries
 * @return Number of entries in the row
 */
-int GetLine(char*** row, int fd) {
+int GetLine(char*** row, int fd, Header header, int columns) {
     int length = 8;
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * (length + 1));
@@ -135,13 +69,18 @@ int GetLine(char*** row, int fd) {
 
     // Create 2D array to hold each entry
     int quotes = 0;
-    int arrsize = 1;
+    int arrsize = columns + 1;
     int position = 0;
     char** entries = (char**) malloc(arrsize * sizeof(char*));
     if (entries == NULL) {
         fprintf(stderr, "ERROR: malloc failed when allocating memory for row entries in GetLine, terminating GetLine.\n");
         printf("ERROR: malloc failed when allocating memory for row entries in GetLine, terminating GetLine.\n");
         return -2;
+    }
+    for (j = 0; j < arrsize; j++) {
+        char entry[1] = "";
+        entry[0] = '\0';
+        entries[j] = entry;
     }
 
     // Parse for commas and quotes
@@ -153,7 +92,7 @@ int GetLine(char*** row, int fd) {
     while (linepos < linelength) {
 
         // If we have more entries than array size, double array length
-        if (position >= arrsize) {
+        /*if (position >= arrsize) {
             arrsize *= 2;
             entries = (char**)realloc(entries, sizeof(char *) * arrsize);
             if (entries == NULL) {
@@ -161,7 +100,7 @@ int GetLine(char*** row, int fd) {
                 printf("ERROR: realloc failed when reallocating memory for row entries in GetLine, terminating GetLine.\n");
                 return -2;
             }
-        }
+        }*/
 
         i = 0;
         size_t entrylength = 30;
@@ -209,8 +148,21 @@ int GetLine(char*** row, int fd) {
                 }
             }
         }
-        entries[position] = entry;
-        position++;
+        char * title = header.titles[position];
+        int l = 0;
+        int found = -1;
+        for (l = 0; l < columns; l++) {
+            if (strcmp(sortHeaders[l], title) == 0) {
+                found = l;
+                break;
+            }
+        }
+        if (found == -1) {
+            return -1;
+        } else {
+            entries[found] = entry;
+            position++;
+        }
     }
 
     if (line[linepos - 1] == ',') { // last column is null
@@ -235,7 +187,7 @@ int GetLine(char*** row, int fd) {
     }
     
     *row = entries;
-    return position;
+    return columns;
 }
 
 /**
@@ -245,14 +197,14 @@ int GetLine(char*** row, int fd) {
 * @param columns Number of columns
 * @return number of rows
 */
-int FillRows(Row** Rows, Header* header, int columns, int fd) {
+int FillRows(Row** Rows, Header header, int columns, int fd) {
     int rows = totalRows;
     int capacity = 1;
     int w = 0;
 
     while (1) {
         char** entries = NULL;
-        int c = GetLine(&entries, fd);
+        int c = GetLine(&entries, fd, header, columns);
         
         if (entries == NULL) {
             return 0;
@@ -267,12 +219,12 @@ int FillRows(Row** Rows, Header* header, int columns, int fd) {
         }
 
         (*Rows)[rows].entries = entries;
-        for (w = 0; w < columns; w++) {
+        /*for (w = 0; w < columns; w++) {
             format t = getType(entries[w]);
             if (t > header->types[w]) {
                 header->types[w] = t;
             }
-        }
+        }*/
         rows++;
         if (rows >= capacity) {
             capacity *= 2;
@@ -435,7 +387,7 @@ int SetHeader(Header* h, int fd) {
             return -2;
         }
         entry[0] = '\0';
-        h->titles[position] = entry;
+        h->titles[position] = trim(entry);
         position++;
     }
 

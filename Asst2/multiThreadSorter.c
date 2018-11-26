@@ -1,10 +1,5 @@
 #include "multiThreadSorter.h"
 
-/**
- * TO-DO:
- * free and close stuff
- */
-
 int main(int argc, char **argv)
 {
 
@@ -17,6 +12,7 @@ int main(int argc, char **argv)
 
     // Thread global variables
     int tid;
+    int i;
 
     // Parse command line arguments with getopt
     while ((a = getopt(argc, argv, "c:d:o:")) != -1)
@@ -95,7 +91,6 @@ int main(int argc, char **argv)
             }
             else
             {
-                int i;
                 for (i = 0; i < length; i++)
                 {
                     if (dvalue[i] == '/')
@@ -156,7 +151,6 @@ int main(int argc, char **argv)
             }
             else
             {
-                int i;
                 for (i = 0; i < length; i++)
                 {
                     if (ovalue[i] == '/')
@@ -194,58 +188,23 @@ int main(int argc, char **argv)
             outDir = NULL;
         }
     }
-
-    /***   Begin Sorting   ***/
     
-    // Print required metadata
-    tid = 1; // Initial directory TID
-    fprintf(stdout, "Initial TID: %d\n", tid);
-    fflush(stdout);
-
-    TArguments *args = (TArguments *)malloc(sizeof(TArguments));
-    args->dir = inDir;
-    args->inPath = inPath;
-    args->outPath = outPath;
-    args->column = colname;
-
-    pthread_t thread;
-    totalTIDs = 1;
-    int success = pthread_create(&thread, NULL, directoryHandler, args);
-    //int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
-
-    // Abort if thread failed to create
-    if (!success)
-    {
-        fprintf(stderr, "ERROR: Could not create main thread\n");
+    char * path = inPath;
+    if (outPath != NULL) {
+        strcpy(oPath, outPath);
+    }
+    char oPath[strlen(outPath) + strlen(colname) + 22];
+    strcpy(oPath, outPath);
+    strcat(oPath, "AllFiles-sorted-");
+    strcat(oPath, colname);
+    strcat(oPath, ".csv");
+    
+    int outFD = open(oPath, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
+    if (outFD < 0) {
+        fprintf(stderr, "ERROR: Could not create file '%s'.\n", outFD);
         return -1;
     }
-
     
-
-    fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
-    for(tid = tid; tid <= totalTIDs; tid++){
-        fprintf(stdout, ", %d", tid);
-    }
-    fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
-
-    fprintf(stdout, "\n");
-    fprintf(stdout, "Total number of threads: %d\n", totalTIDs);
-
-    // Check if threads failed to join
-    void* joinStatus;
-    pthread_join(thread, &joinStatus);
-    fprintf(stderr, "ERROR: Could join threads.\n");
-    if ((int)(intptr_t) joinStatus < 0) return -1;
-
-    // Mergesort all rows
-
-    // Call mergeSort (from mergesort.c)
-    char outFD[1];
-    strcpy(outFD,outPath);
-    strcpy(outFD, "AllFiles-sorted-");
-    strcat(outFD, colname);
-    strcat(outFD, ".csv");
-
     sortHeaders[0] = "color";
     sortHeaders[1] = "director_name";
     sortHeaders[2] = "num_critic_for_reviews";
@@ -274,37 +233,96 @@ int main(int argc, char **argv)
     sortHeaders[25] = "imdb_score";
     sortHeaders[26] = "aspect_ratio";
     sortHeaders[27] = "movie_facebook_likes";
+    
+    ALL_DATA = (Row**)malloc(sizeof(Row*) * 256);
+    for (i = 0; i < 256; i++) {
+        ALL_DATA[i] = NULL;
+    }
+    ALL_DATA_COUNT = (int*)(malloc(sizeof(int)));
+    *ALL_DATA_COUNT = 0;
+    ALL_DATA_MAX = (int*)(malloc(sizeof(int)));
+    *ALL_DATA_MAX = 256;
+    ALL_DATA_ROW_COUNT = (int*)(malloc(sizeof(int)));
+    *ALL_DATA_ROW_COUNT = 0;
 
-    int p = 0;
-    int i = 0;
+    /***   Begin Sorting   ***/
+    
+    // Print required metadata
+    tid = 1; // Initial directory TID
+    int pid = getpid();
+    
+    if (pthread_mutex_init(&_fileLock, NULL) != 0) { 
+        fprintf(stderr, "Could not initialize mutex for file locking\n"); 
+        fprintf(stdout, "Could not initialize mutex for file locking\n"); 
+        return -1; 
+    }
+    
+    if (pthread_mutex_init(&_printLock, NULL) != 0) { 
+        fprintf(stderr, "Could not initialize mutex for print locking\n"); 
+        fprintf(stdout, "Could not initialize mutex for print locking\n"); 
+        return -1; 
+    }
 
-    int oPath = open(outFD, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
-    if (outFD < 0) {
-        fprintf(stderr, "ERROR: Could not create file '%s'.\n", outFD);
+    TArguments *args = (TArguments *)malloc(sizeof(TArguments));
+    args->dir = inDir;
+    args->inPath = inPath;
+    args->outPath = outPath;
+    args->column = colname;
+    args->file = NULL;
+    args->filePath = NULL;
+
+    pthread_t thread;
+    totalTIDs = 1;
+    int success = pthread_create(&thread, NULL, directoryHandler, (void*)args);
+    //int processes = directoryHandler(inDir, colname, inPath, outPath); // Call directoryHandler on inDir (from sorter.c)
+
+    // Abort if thread failed to create
+    if (success != 0)
+    {
+        fprintf(stderr, "ERROR: Could not create main thread\n");
+        fprintf(stdout, "ERROR: Could not create main thread\n");
         return -1;
     }
 
+    fprintf(stdout, "Initial PID: %d\n", getpid());
+    fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
+    for (tid = tid; tid <= totalTIDs; tid++) {
+        fprintf(stdout, ", %d", tid);
+    }
+    fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
+
+    fprintf(stdout, "\n");
+    fprintf(stdout, "Total number of threads: %d\n", totalTIDs);
+
+    // Check if threads failed to join
+    void* joinStatus;
+    pthread_join(thread, &joinStatus);
+    fprintf(stderr, "ERROR: Could not join threads.\n");
+    if ((int)(intptr_t) joinStatus < 0) return -1;
+
+    int p = 0;
+
     for (p = 0; p < totalCols; p++) {
-        write(oPath, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
-        if (p !=  - 1) {
-            write(oPath, ",", 1);
+        write(outFD, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
+        if (p != totalCols - 1) {
+            write(outFD, ",", 1);
         }
     }
-    write(oPath, "\n", 1);
+    write(outFD, "\n", 1);
 
     for (i = 0; i < totalRows; i++) {
         for (p = 0; p < totalCols; p++){
-            write(oPath, output[i].entries[p], strlen(output[i].entries[p])); // write row to output file
+            write(outFD, output[i].entries[p], strlen(output[i].entries[p])); // write row to output file
             if (p != totalCols - 1) {
-                write(oPath, ",", 1);
+                write(outFD, ",", 1);
             }
         }
-        write(oPath, "\n", 1);
+        write(outFD, "\n", 1);
     }
 
     // Close dirs and free stuff
     closedir(inDir);
-    close(oPath);
+    close(outFD);
     if (outDir != NULL)
     {
         closedir(outDir);
