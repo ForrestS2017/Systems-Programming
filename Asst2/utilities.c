@@ -27,7 +27,7 @@ int GetIndex(char** source, char* target) {
   @param row Destination of row entries
 * @return Number of entries in the row
 */
-int GetLine(char*** row, int fd, Header header, int columns) {
+int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUMNS) {
     int length = 8;
     int count = 0;
     char * line = (char*)malloc(sizeof(char) * (length + 1));
@@ -148,6 +148,9 @@ int GetLine(char*** row, int fd, Header header, int columns) {
                 }
             }
         }
+        if (position >= c) {
+            break;
+        }
         char * title = header.titles[position];
         int l = 0;
         int found = -1;
@@ -197,14 +200,14 @@ int GetLine(char*** row, int fd, Header header, int columns) {
 * @param columns Number of columns
 * @return number of rows
 */
-int FillRows(Row** Rows, Header header, int columns, int fd) {
+int FillRows(Row** Rows, Header header, int columns, int c, int fd) {
     int rows = totalRows;
     int capacity = 1;
     int w = 0;
 
     while (1) {
         char** entries = NULL;
-        int c = GetLine(&entries, fd, header, columns);
+        int c = GetLine(&entries, fd, header, columns, c);
         
         if (entries == NULL) {
             return 0;

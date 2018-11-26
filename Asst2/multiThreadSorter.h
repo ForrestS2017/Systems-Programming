@@ -42,6 +42,12 @@ typedef struct _TArguments
     char * inPath; // DIR* dir, char* column, char* inPath, char* outPath
 } TArguments;
 
+typedef struct _Data
+{
+    Row* rows;
+    int count;
+} Data;
+
 // Directory global variables
 char *inPath;
 char *outPath;
@@ -50,20 +56,20 @@ DIR *inDir;
 DIR *outDir;
 Row* sortRows;
 Row* output;
-Row** ALL_DATA;
+Data* ALL_DATA;
 int* ALL_DATA_COUNT;
 int* ALL_DATA_MAX;
 int* ALL_DATA_ROW_COUNT;
 
 char * sortHeaders[28]; // probably want to be const to make this work best
 
-format types[] = { STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, STRING, NUMBER, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, STRING, NUMBER, STRING, STRING, NUMBER, STRING, STRING, STRING, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER };
+format types[28];
 
 // Countable variables
 int totalTIDs;
-int totalCols = 28;
-int totalRows = 0;
-int sortIndex = -1;
+int totalCols;
+int totalRows;
+int sortIndex;
 
 // Mutex locks 
 pthread_mutex_t _fileLock;
@@ -89,13 +95,13 @@ Row *mergeSort(Row *, int, int, format);
 int CheckInput(int, char **);
 
 // Reads current row and returns number of entries
-int GetLine(char ***, int);
+int GetLine(char***, int, Header, int, int);
 
 // Get Index of a row entry
 int GetIndex(char **source, char *target);
 
 // Fills Rows with Row structs, using GetLine()
-int FillRows(Row **, Header *, int, int);
+int FillRows(Row**, Header, int, int, int);
 
 // Sets the header for a given file
 int SetHeader(Header *, int);
@@ -112,4 +118,4 @@ void * fileHandler(void *);
 // Handles operations on directories
 void * directoryHandler(void *);
 
-#endif /* SIMPLECSVSORTER_H_ */
+#endif /* MULTITHREADSORTER_H_ */

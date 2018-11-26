@@ -7,7 +7,7 @@
  * @param column Name of column to be sorted on
  * @return 0 if successful, -1 if error occurred
  */
-int Sort(char* filePath, char* oPath, char* column) {
+/*int Sort(char* filePath, char* oPath, char* column) {
     int inFD = open(filePath, O_RDONLY);
     if (inFD == -1) {
         fprintf(stderr, "ERROR: Could not open file '%s'.\n", filePath);
@@ -66,7 +66,7 @@ int Sort(char* filePath, char* oPath, char* column) {
     }
     
 
-    int rowcount = FillRows(&sortRows, &header, c, inFD); // Fill in row data
+    //int rowcount = FillRows(&sortRows, &header, c, inFD); // Fill in row data
    
     if (rowcount == -1) {
         fprintf(stderr, "ERROR: Number of columns does not match the number of headings in file '%s'.\n", filePath);
@@ -117,7 +117,7 @@ int Sort(char* filePath, char* oPath, char* column) {
     //free(output);
     close(inFD);
     return 0;
-}
+}*/
 
 /**
  * Performs operations on files
@@ -182,7 +182,7 @@ void* fileHandler(void* args) {
     int inFD = open(filePath, O_RDONLY);
     if (inFD == -1) {
         fprintf(stderr, "ERROR: Could not open file '%s'.\n", filePath);
-        return -1;
+        return NULL;
     }
     
     // Get column titles
@@ -191,26 +191,34 @@ void* fileHandler(void* args) {
     if (header.titles == NULL) {
         fprintf(stderr, "ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
         printf("ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
-        return -1;
+        return NULL;
     }
 
     int i = 0;
     int c = SetHeader(&header, inFD); // Number of columns in table
     if (c == -1) {
         fprintf(stderr, "ERROR: No heading or columns found in file '%s'.\n", filePath);
-        return -1;
+        return NULL;
     }
+    
+    Row* rows = (Row*)malloc(sizeof(Row));
+    if (rows == NULL) {
+        fprintf(stderr, "ERROR: malloc failed when allocating memory for rows in Sort, terminating Sort.\n");
+        printf("ERROR: malloc failed when allocating memory for rows in Sort, terminating Sort.\n");
+        return NULL;
+    }
+    rows[0].entries = NULL;
 
-    int rowcount = FillRows(&rows, header, totalCols, inFD); // Fill in row data
+    int rowcount = FillRows(&rows, header, totalCols, c, inFD); // Fill in row data
    
     if (rowcount == -1) {
         fprintf(stderr, "ERROR: Number of columns does not match the number of headings in file '%s'.\n", filePath);
-        return -1;
+        return NULL;
     } else if (rowcount == 0) {
         fprintf(stderr, "ERROR: No records found in file '%s'.\n", filePath);
-        return -1;
+        return NULL;
     } else if (rowcount == -2) {
-        return -1; // Memory allocation failure
+        return NULL; // Memory allocation failure
     }
 
     int index = -1; // index of column to sort on
@@ -223,15 +231,21 @@ void* fileHandler(void* args) {
     
     Row* Output = mergeSort(rows, rowcount, index, types[index]);
     
+    if (rows != Output) {
+        free(rows);
+    }
+    
     pthread_mutex_lock(&_fileLock); 
     if ((*ALL_DATA_COUNT) >= (*ALL_DATA_MAX)) {
         (*ALL_DATA_MAX) *= 2;
-        ALL_DATA = (Row**)realloc(ALL_DATA, sizeof(Row*) * (*ALL_DATA_MAX));
+        ALL_DATA = (Data*)realloc(ALL_DATA, sizeof(Data) * (*ALL_DATA_MAX));
+        Data empty = { NULL, 0};
         for (i = 0; i < (*ALL_DATA_MAX) / 2 + 1; i++) {
-            ALL_DATA[i] = NULL;
-        }        
+            ALL_DATA[i] = empty;
+        }
     }
-    ALL_DATA[(*ALL_DATA_COUNT)] = Output;
+    ALL_DATA[(*ALL_DATA_COUNT)].rows = Output;
+    ALL_DATA[(*ALL_DATA_COUNT)].count = rowcount;
     *ALL_DATA_COUNT++;
     *ALL_DATA_ROW_COUNT += rowcount;
     pthread_mutex_unlock(&_fileLock);
@@ -260,7 +274,7 @@ void* directoryHandler(void* args) {
     
     
     int * tids = (int*)malloc(sizeof(int) * 256);
-    tids[0] = tid;
+    //tids[0] = tid;
     int j;
     for (j = 1; j < 256; j++) {
         tids[j] = 0;
@@ -288,11 +302,11 @@ void* directoryHandler(void* args) {
             DIR * directory = opendir(path);
             if (directory == NULL) {
                 fprintf(stderr, "ERROR: Could not open directory '%s'\n", path);
-                exit(1);
+                return NULL;
             } else {
                 TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
                 nextArgs->dir = directory;
-                nextArgs->inPath = inPath;
+                nextArgs->inPath = path;
                 nextArgs->outPath = outPath;
                 nextArgs->column = column;
                 nextArgs->file = NULL;
@@ -302,13 +316,14 @@ void* directoryHandler(void* args) {
                 pthread_create(&thread, NULL, directoryHandler, nextArgs); // Create thread for next subdirectory
                 void* joinStatus;
                 pthread_join(thread, &joinStatus);
-                fprintf(stderr, "ERROR: Could join threads.\n");
+                //fprintf(stderr, "ERROR: Could join threads.\n");
                 if ((int)(intptr_t) joinStatus < 0) return (void*)(size_t)  -1;
                 totalTIDs += 1;
                 threads++;
                 //return (void*) (size_t) threads; // Exit with the number of children
             }
         } else if (file->d_type == DT_REG) { // If dir entry is a regular file
+            printf("%s\n", path);
             TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
             nextArgs->file = file;
             nextArgs->filePath = path;
@@ -321,7 +336,7 @@ void* directoryHandler(void* args) {
             pthread_create(&thread, NULL, fileHandler, nextArgs); // Create thread for next file via file handler on the file
             void* joinStatus;
             pthread_join(thread, &joinStatus);
-            fprintf(stderr, "ERROR: Could join threads.\n");
+            //fprintf(stderr, "ERROR: Could join threads.\n");
             if ((int)(intptr_t) joinStatus < 0) return (void*) (size_t) -1;
             totalTIDs += 1;
             threads++;

@@ -128,9 +128,8 @@ int main(int argc, char **argv)
         return 0;
     }
     if (ovalue == NULL)
-    {
-        outPath = NULL;
-        outDir = NULL;
+    { // Default outPath is current working directory ('.')
+        outPath = "./";
     }
     else
     {
@@ -184,17 +183,16 @@ int main(int argc, char **argv)
         }
         else
         {
-            outPath = NULL;
-            outDir = NULL;
+            outPath = "./";
         }
     }
     
     char * path = inPath;
     if (outPath != NULL) {
-        strcpy(oPath, outPath);
+        strcpy(path, outPath);
     }
-    char oPath[strlen(outPath) + strlen(colname) + 22];
-    strcpy(oPath, outPath);
+    char oPath[strlen(path) + strlen(colname) + 22];
+    strcpy(oPath, path);
     strcat(oPath, "AllFiles-sorted-");
     strcat(oPath, colname);
     strcat(oPath, ".csv");
@@ -205,6 +203,39 @@ int main(int argc, char **argv)
         return -1;
     }
     
+    totalCols = 28;
+    totalRows = 0;
+    sortIndex = -1;
+    
+    types[0] = STRING;
+    types[1] = STRING;
+    types[2] = NUMBER;
+    types[3] = NUMBER;
+    types[4] = NUMBER;
+    types[5] = NUMBER;
+    types[6] = STRING;
+    types[7] = NUMBER;
+    types[8] = NUMBER;
+    types[9] = STRING;
+    types[10] = STRING;
+    types[11] = STRING;
+    types[12] = NUMBER;
+    types[13] = NUMBER;
+    types[14] = STRING;
+    types[15] = NUMBER;
+    types[16] = STRING;
+    types[17] = STRING;
+    types[18] = NUMBER;
+    types[19] = STRING;
+    types[20] = STRING;
+    types[21] = STRING;
+    types[22] = NUMBER;
+    types[23] = NUMBER;
+    types[24] = NUMBER;
+    types[25] = NUMBER;
+    types[26] = NUMBER;
+    types[27] = NUMBER;
+
     sortHeaders[0] = "color";
     sortHeaders[1] = "director_name";
     sortHeaders[2] = "num_critic_for_reviews";
@@ -234,9 +265,24 @@ int main(int argc, char **argv)
     sortHeaders[26] = "aspect_ratio";
     sortHeaders[27] = "movie_facebook_likes";
     
-    ALL_DATA = (Row**)malloc(sizeof(Row*) * 256);
+    int HEADER_INDEX = -1;
+    for (i = 0; i < 28; i++) {
+        if (strcmp(colname, sortHeaders[i]) == 0) {
+            HEADER_INDEX = i;
+            break;
+        }
+    }
+    
+    if (HEADER_INDEX == -1) {
+        fprintf(stderr, "ERROR: '%s' is not a valid column.\n", colname);
+        fprintf(stdout, "ERROR: '%s' is not a valid column.\n", colname);
+        return 0;
+    }
+    
+    ALL_DATA = (Data*)malloc(sizeof(Data) * 256);
+    Data empty = { NULL, 0};
     for (i = 0; i < 256; i++) {
-        ALL_DATA[i] = NULL;
+        ALL_DATA[i] = empty;
     }
     ALL_DATA_COUNT = (int*)(malloc(sizeof(int)));
     *ALL_DATA_COUNT = 0;
@@ -297,11 +343,52 @@ int main(int argc, char **argv)
     // Check if threads failed to join
     void* joinStatus;
     pthread_join(thread, &joinStatus);
-    fprintf(stderr, "ERROR: Could not join threads.\n");
+    //fprintf(stderr, "ERROR: Could join threads.\n");
     if ((int)(intptr_t) joinStatus < 0) return -1;
 
-    int p = 0;
+    int number_files = *ALL_DATA_COUNT;
+    
+    if (number_files == 0 || ALL_DATA[0].rows == NULL) {
+        int p = 0;
+        for (p = 0; p < totalCols; p++) {
+            write(outFD, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
+            if (p != totalCols - 1) {
+                write(outFD, ",", 1);
+            }
+        }
+        write(outFD, "\n", 1);
+        closedir(inDir);
+        close(outFD);
+        if (outDir != NULL)
+        {
+            closedir(outDir);
+        }
+        if (dvalue != NULL)
+        {
+            free(inPath);
+        }
+        if (ovalue != NULL)
+        {
+            free(outPath);
+        }
+        return 0;
+    }
+    
+    totalRows = *ALL_DATA_ROW_COUNT;
+    output = ALL_DATA[0].rows;
+    int count = ALL_DATA[0].count;
+    for (i = 1; i < number_files; i++) {
+        if (ALL_DATA[i].rows != NULL) {
+            count += ALL_DATA[i].count;
+            Row* combine = merge(output, count, ALL_DATA[i].rows, ALL_DATA[i].count, HEADER_INDEX, types[HEADER_INDEX]);
+            if (combine != output) {
+                free(output);
+            }
+            output = combine;
+        }
+    }
 
+    int p = 0;
     for (p = 0; p < totalCols; p++) {
         write(outFD, sortHeaders[p], strlen(sortHeaders[p])); // write header to output file
         if (p != totalCols - 1) {
