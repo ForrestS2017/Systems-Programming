@@ -178,6 +178,7 @@ void* fileHandler(void* args) {
     strcat(oPath, ending);*/
     
     //Sort(filePath, oPath, column);
+    //printf("%s\n", filePath);
 
     int inFD = open(filePath, O_RDONLY);
     if (inFD == -1) {
@@ -187,7 +188,7 @@ void* fileHandler(void* args) {
     
     // Get column titles
     Header header = { NULL, NULL };
-    header.titles = (char**)malloc(sizeof(char*) * 10);
+    header.titles = (char**)malloc(sizeof(char*) * 28);
     if (header.titles == NULL) {
         fprintf(stderr, "ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
         printf("ERROR: malloc failed when allocating memory for header.titles in Sort, terminating Sort.\n");
@@ -211,7 +212,7 @@ void* fileHandler(void* args) {
 
     int rowcount = FillRows(&rows, header, totalCols, c, inFD); // Fill in row data
    
-    if (rowcount == -1) {
+    if (rowcount == -4) {
         fprintf(stderr, "ERROR: Number of columns does not match the number of headings in file '%s'.\n", filePath);
         return NULL;
     } else if (rowcount == 0) {
@@ -219,10 +220,13 @@ void* fileHandler(void* args) {
         return NULL;
     } else if (rowcount == -2) {
         return NULL; // Memory allocation failure
+    } else if (rowcount == -3) {
+        fprintf(stderr, "ERROR: Invalid column name found in file '%s'.\n", filePath);
+        return NULL;
     }
 
     int index = -1; // index of column to sort on
-    for (i = 0; i < c; i++) {
+    for (i = 0; i < totalCols; i++) {
         if (strcmp(column, sortHeaders[i]) == 0) {
             index = i;
             break;
@@ -246,8 +250,8 @@ void* fileHandler(void* args) {
     }
     ALL_DATA[(*ALL_DATA_COUNT)].rows = Output;
     ALL_DATA[(*ALL_DATA_COUNT)].count = rowcount;
-    *ALL_DATA_COUNT++;
-    *ALL_DATA_ROW_COUNT += rowcount;
+    *ALL_DATA_COUNT = (*ALL_DATA_COUNT) + 1;
+    *ALL_DATA_ROW_COUNT = (*ALL_DATA_ROW_COUNT) + rowcount;
     pthread_mutex_unlock(&_fileLock);
 
     close(inFD);
@@ -323,7 +327,6 @@ void* directoryHandler(void* args) {
                 //return (void*) (size_t) threads; // Exit with the number of children
             }
         } else if (file->d_type == DT_REG) { // If dir entry is a regular file
-            printf("%s\n", path);
             TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
             nextArgs->file = file;
             nextArgs->filePath = path;
