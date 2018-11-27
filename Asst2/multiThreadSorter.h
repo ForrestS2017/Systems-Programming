@@ -60,6 +60,7 @@ Data* ALL_DATA;
 int* ALL_DATA_COUNT;
 int* ALL_DATA_MAX;
 int* ALL_DATA_ROW_COUNT;
+char* EMPTY;
 
 char * sortHeaders[28]; // probably want to be const to make this work best
 

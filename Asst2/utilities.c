@@ -78,9 +78,7 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
         return -2;
     }
     for (j = 0; j < arrsize; j++) {
-        char entry[1] = "";
-        entry[0] = '\0';
-        entries[j] = entry;
+        entries[j] = EMPTY;
     }
 
     // Parse for commas and quotes
@@ -148,8 +146,8 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
                 }
             }
         }
-        if (position >= c) {
-            break;
+        if (position >= NUMBER_OF_COLUMNS) {
+            return -4;
         }
         char * title = header.titles[position];
         int l = 0;
@@ -161,14 +159,14 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
             }
         }
         if (found == -1) {
-            return -1;
+            return -3;
         } else {
             entries[found] = entry;
             position++;
         }
     }
 
-    if (line[linepos - 1] == ',') { // last column is null
+    /*if (line[linepos - 1] == ',') { // last column is null
         if (position >= arrsize) {
             arrsize++;
             entries = (char**)realloc(entries, sizeof(char*) * arrsize);
@@ -187,9 +185,21 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
         entry[0] = '\0';
         entries[position] = entry;
         position++;
+    }*/
+    
+    int hhh;
+    int notEmpty = 0;
+    for (hhh = 0; hhh < arrsize; hhh++) {
+        if (entries[hhh][0] != '\0') {
+            notEmpty = 1;
+        }
+    }
+    if (notEmpty == 0) {
+        printf("EMPTY\n");
     }
     
     *row = entries;
+    free(line);
     return columns;
 }
 
@@ -200,25 +210,21 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
 * @param columns Number of columns
 * @return number of rows
 */
-int FillRows(Row** Rows, Header header, int columns, int c, int fd) {
-    int rows = totalRows;
+int FillRows(Row** Rows, Header header, int columns, int NUMBER_OF_COLUMNS, int fd) {
+    int rows = 0;
     int capacity = 1;
     int w = 0;
 
     while (1) {
         char** entries = NULL;
-        int c = GetLine(&entries, fd, header, columns, c);
+        int c = GetLine(&entries, fd, header, columns, NUMBER_OF_COLUMNS);
         
-        if (entries == NULL) {
-            return 0;
+        if (c < -1) {
+            return c;
         }
         
-        if (c != columns) {
-            if (c == -2) {
-                return -2; // For malloc/realloc failure
-            } else {
-                return -1;
-            }
+        if (entries == NULL) {
+            return rows;
         }
 
         (*Rows)[rows].entries = entries;
@@ -242,7 +248,6 @@ int FillRows(Row** Rows, Header header, int columns, int c, int fd) {
             }
         }
     }
-    totalRows = rows;
     return rows;
 }
 

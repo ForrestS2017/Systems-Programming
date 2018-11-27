@@ -187,12 +187,19 @@ int main(int argc, char **argv)
         }
     }
     
-    char * path = inPath;
+    
+    int pathL = 0;
     if (outPath != NULL) {
-        strcpy(path, outPath);
+        pathL = strlen(outPath);
+    } else {
+        pathL = strlen(inPath);
     }
-    char oPath[strlen(path) + strlen(colname) + 22];
-    strcpy(oPath, path);
+    char oPath[pathL + strlen(colname) + 22];
+    if (outPath != NULL) {
+        strcpy(oPath, outPath);
+    } else {
+        strcpy(oPath, inPath);
+    }
     strcat(oPath, "AllFiles-sorted-");
     strcat(oPath, colname);
     strcat(oPath, ".csv");
@@ -264,6 +271,9 @@ int main(int argc, char **argv)
     sortHeaders[25] = "imdb_score";
     sortHeaders[26] = "aspect_ratio";
     sortHeaders[27] = "movie_facebook_likes";
+    
+    EMPTY = (char*)malloc(sizeof(char));
+    EMPTY[0] = '\0';
     
     int HEADER_INDEX = -1;
     for (i = 0; i < 28; i++) {
@@ -346,7 +356,7 @@ int main(int argc, char **argv)
     //fprintf(stderr, "ERROR: Could join threads.\n");
     if ((int)(intptr_t) joinStatus < 0) return -1;
 
-    int number_files = *ALL_DATA_COUNT;
+    int number_files = (*ALL_DATA_COUNT);
     
     if (number_files == 0 || ALL_DATA[0].rows == NULL) {
         int p = 0;
@@ -379,8 +389,8 @@ int main(int argc, char **argv)
     int count = ALL_DATA[0].count;
     for (i = 1; i < number_files; i++) {
         if (ALL_DATA[i].rows != NULL) {
-            count += ALL_DATA[i].count;
             Row* combine = merge(output, count, ALL_DATA[i].rows, ALL_DATA[i].count, HEADER_INDEX, types[HEADER_INDEX]);
+            count += ALL_DATA[i].count;
             if (combine != output) {
                 free(output);
             }
@@ -422,6 +432,7 @@ int main(int argc, char **argv)
     {
         free(outPath);
     }
+    free(EMPTY);
 
     return 0;
 }
