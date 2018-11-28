@@ -21,6 +21,7 @@ SOLUTION:
     - All rows of all valid CSV's are stored in a linked list of _Row objects to be sorted
     - CSVs are parsed into column header structs and row structs. The column header structs hold the columns of the CSV file and the type of data held in the column, using a _format enum. The rows hold the cells of each row of the CSV file in a string (char**) array.
     - The column headers of each file are checked to ensure that they adhere to our targeted set of headers. If an additional un-targeted column is present, or our column to sort by is absent, we do not use the file (thread count still incremented).
+    - The amount of threads created is tracked by counting the number of files in a directory, creating a pthread_t array long enough to hold all potential threads, and then once each file is read/checked, we join them all back and count the amount of valid threads created
     - CSV files and output files are read/created with open(), parsed, sorted, and subsequently closed with close().
     - Each row of the CSV is read in using the read() function.
     - Folders are traversed and tracked with directoryHandler() and fileHandler() which also check for valid files and folders.
