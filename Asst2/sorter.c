@@ -149,7 +149,7 @@ void* fileHandler(void* args) {
     //     }
     // }    
     if (n < 4 || strcmp(file->d_name + (n - 4), ".csv") != 0) { // Check if file ends with .csv
-        fprintf(stderr, "File '%s' is not a .csv file\n", filePath);
+        fprintf(stderr, "File '%s' is not a .csv file:\n", filePath);
         return (void*)(size_t)  0; // Don't sort if not a .csv file
     }
     /*int p = 0; // Length of path to output directory
@@ -255,6 +255,12 @@ void* fileHandler(void* args) {
     pthread_mutex_unlock(&_fileLock);
 
     close(inFD);
+
+    pthread_mutex_lock(&_printLock);
+    int pid = getpid();
+    fprintf(stdout, "\nInitial PID: %d\nTIDS of all spawned threads:\nTotal number of threads: 0\n\n", pid);
+    fflush(stdout);
+    pthread_mutex_unlock(&_printLock);
     
     return (void*) (size_t) 0;
 }
@@ -270,6 +276,9 @@ void* fileHandler(void* args) {
 void* directoryHandler(void* args) {
     TArguments * tArgs = (TArguments*)args;
     int threads = 0;
+    int cTID = 1;
+    int files = 0;
+    int i = 0;
     
     DIR * dir = tArgs->dir;
     char * inPath = tArgs->inPath;
@@ -285,6 +294,17 @@ void* directoryHandler(void* args) {
     }
     
     struct dirent * file;
+
+    // Get number of files/directories
+    while((file = readdir(dir))){
+        files++;
+    }
+     files -= 2;
+    // Keep track of all threads in an array
+    pthread_t threadArr[files];
+    rewinddir(dir);
+    
+
     while ((file = readdir(dir)) != NULL) { // Loop through directory
         if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0) { // Don't run on . or ..
             continue;
@@ -301,8 +321,13 @@ void* directoryHandler(void* args) {
         threads = 0; // Set threads to 0 since at this point, the child has 0 spawned threads as far as we know
         //fprintf(stdout, "%d,", getpid()); // Print PID
         //fflush(stdout); // Force write to stdout
+        
+
+        
+        //fprintf(stdout, "\n __PATH: %s\n", path); fflush(stdout);
         if (file->d_type == DT_DIR) { // If dir entry is a directory
-            strcat(path, "/"); // Add / to the nd of the path
+            //fprintf(stdout, "D-PATH: %s\n", path); fflush(stdout);
+            strcat(path, "/"); // Add / to the end of the path
             DIR * directory = opendir(path);
             if (directory == NULL) {
                 fprintf(stderr, "ERROR: Could not open directory '%s'\n", path);
@@ -315,18 +340,19 @@ void* directoryHandler(void* args) {
                 nextArgs->column = column;
                 nextArgs->file = NULL;
                 nextArgs->filePath = NULL;
-                pthread_t thread;
+                //pthread_t thread;
                 
-                pthread_create(&thread, NULL, directoryHandler, nextArgs); // Create thread for next subdirectory
-                void* joinStatus;
-                pthread_join(thread, &joinStatus);
-                //fprintf(stderr, "ERROR: Could join threads.\n");
-                if ((int)(intptr_t) joinStatus < 0) return (void*)(size_t)  -1;
-                totalTIDs += 1;
-                threads++;
+                pthread_create(&threadArr[i], NULL, directoryHandler, nextArgs); // Create thread for next subdirectory
+                // void* joinStatus;
+                // pthread_join(thread, &joinStatus);
+                // //fprintf(stderr, "ERROR: Could join threads.\n");
+                // totalTIDs += 1;
+                // threads += 1;
+                // if ((int)(intptr_t) joinStatus < 0) return (void*)(size_t)  -1;
                 //return (void*) (size_t) threads; // Exit with the number of children
             }
         } else if (file->d_type == DT_REG) { // If dir entry is a regular file
+            //fprintf(stdout, "F-PATH: %s\n", path); fflush(stdout);
             TArguments * nextArgs = (TArguments *)malloc(sizeof(TArguments));
             nextArgs->file = file;
             nextArgs->filePath = path;
@@ -335,22 +361,41 @@ void* directoryHandler(void* args) {
             nextArgs->column = column;
             nextArgs->dir = NULL;
 
-            pthread_t thread;
-            pthread_create(&thread, NULL, fileHandler, nextArgs); // Create thread for next file via file handler on the file
-            void* joinStatus;
-            pthread_join(thread, &joinStatus);
-            //fprintf(stderr, "ERROR: Could join threads.\n");
-            if ((int)(intptr_t) joinStatus < 0) return (void*) (size_t) -1;
-            totalTIDs += 1;
-            threads++;
+            //pthread_t thread;
+            pthread_create(&threadArr[i], NULL, fileHandler, nextArgs); // Create thread for next file via file handler on the file
+            // void* joinStatus;
+            // pthread_join(thread, &joinStatus);
+            // //fprintf(stderr, "ERROR: Could join threads.\n");
+            // totalTIDs += 1;
+            // threads = threads + 1;
+            // if ((int)(intptr_t) joinStatus < 0) return (void*) (size_t) -1;
             //..exit(1); // Exit with 1 to indicate 1 process
         } else {
             fprintf(stderr, "ERROR: Directory entry '%s' is not a directory or a regular file\n", path);
             //return (void*)(size_t) threads;
         }
+        i++;
     }
-    
-    //output = mergeSort(sortRows, totalRows, sortIndex, types[sortIndex]);
 
+    // Await threads
+    void* joinStatus = NULL;
+    for (i = 0; i < files; i++){
+      pthread_join(threadArr[i], &joinStatus);
+      if ((int)(intptr_t) joinStatus < 0) threads++; 
+      else threads += (int)(intptr_t)joinStatus + 1;
+    }
+    if (joinStatus) free(joinStatus);
+    
+    pthread_mutex_lock(&_printLock);
+    int pid = getpid();
+    fprintf(stdout, "\nInitial PID: %d\nTIDS of all spawned threads:", pid);
+    for (cTID = 1; cTID <= threads; cTID++) {
+        fprintf(stdout, "%d", cTID);
+        if (cTID < threads) fprintf(stdout, ", ");
+    }
+    fprintf(stdout, "\nTotal number of threads: %d\n\n", threads);
+    fflush(stdout);
+    pthread_mutex_unlock(&_printLock);
+    
     return (void*) (size_t) threads;
 }

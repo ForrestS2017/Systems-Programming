@@ -321,6 +321,9 @@ int main(int argc, char **argv)
         return -1; 
     }
 
+    // First metadata line
+    fprintf(stdout, "Initial PID: %d\n", getpid());
+
     TArguments *args = (TArguments *)malloc(sizeof(TArguments));
     args->dir = inDir;
     args->inPath = inPath;
@@ -342,15 +345,15 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    fprintf(stdout, "Initial PID: %d\n", getpid());
+    //pthread_mutex_lock(&_printLock);
     fprintf(stdout, "TIDS of all spawned threads: "); // No newline, PIDs will be outputed to stdout by other processes
     for (tid = tid; tid <= totalTIDs; tid++) {
-        fprintf(stdout, ", %d", tid);
+        fprintf(stdout, "%d", tid);
+        if (tid < totalTIDs) fprintf(stdout, ", ");
     }
+    fprintf(stdout, "\nTotal number of threads: %d\n", totalTIDs);
     fflush(stdout);                                   // Make sure to fflush stdout so printing errors don't occur
-
-    fprintf(stdout, "\n");
-    fprintf(stdout, "Total number of threads: %d\n", totalTIDs);
+    //pthread_mutex_unlock(&_printLock);
 
     // Check if threads failed to join
     void* joinStatus;

@@ -75,6 +75,7 @@ int sortIndex;
 // Mutex locks 
 pthread_mutex_t _fileLock;
 pthread_mutex_t _printLock;
+pthread_mutex_t _incrLock;
 /***** Functions *****/
 
 // Compares two strings
