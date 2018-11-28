@@ -208,7 +208,7 @@ int main(int argc, char **argv)
     
     int outFD = open(oPath, O_RDWR | O_CREAT, 0600); // Create a file with read/write permissions for owner
     if (outFD < 0) {
-        fprintf(stderr, "ERROR: Could not create file '%d'.\n", outFD);
+        fprintf(stderr, "ERROR: Could not create file '%s'.\n", oPath);
         return -1;
     }
     

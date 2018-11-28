@@ -187,7 +187,7 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
         position++;
     }*/
     
-    int hhh;
+    /*int hhh;
     int notEmpty = 0;
     for (hhh = 0; hhh < arrsize; hhh++) {
         if (entries[hhh][0] != '\0') {
@@ -196,7 +196,7 @@ int GetLine(char*** row, int fd, Header header, int columns, int NUMBER_OF_COLUM
     }
     if (notEmpty == 0) {
         printf("EMPTY\n");
-    }
+    }*/
     
     *row = entries;
     free(line);

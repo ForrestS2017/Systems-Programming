@@ -149,7 +149,7 @@ void* fileHandler(void* args) {
     //     }
     // }    
     if (n < 4 || strcmp(file->d_name + (n - 4), ".csv") != 0) { // Check if file ends with .csv
-        fprintf(stderr, "File '%s' is not a .csv file:\n", filePath);
+        fprintf(stderr, "File '%s' is not a .csv file\n", filePath);
         return (void*)(size_t)  0; // Don't sort if not a .csv file
     }
     /*int p = 0; // Length of path to output directory
@@ -312,7 +312,8 @@ void* directoryHandler(void* args) {
         
         int n = strlen(file->d_name);        
         int m = strlen(inPath);
-        char path[m + n + 2]; // Get full path to current file
+        //char path[m + n + 2]; // Get full path to current file
+        char * path = (char*)malloc(sizeof(char) * (m + n + 2));
         strcpy(path, inPath);
         strcat(path, file->d_name);
         
