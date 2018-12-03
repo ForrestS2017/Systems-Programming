@@ -24,6 +24,12 @@ typedef struct _Account {
 
 } Account;
 
+typedef struct _Node {
+    Account* account;
+    struct _Node* next;
+} Node;
+
+Node* Accounts;
 
 /** Functions **/
 
