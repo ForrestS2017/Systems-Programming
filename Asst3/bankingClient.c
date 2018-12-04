@@ -5,14 +5,14 @@ int main(int argc, char** argv){
 
 	// Verify command line arguments
 	if (argc != 3) {
-		fprintf(stderr, "ERROR: Invalid argument count");
+		fprintf(stderr, "ERROR: Invalid argument count\n");
 		//fprintf(stdout, "ERROR: Invalid argument count");
 		fflush(stderr);
 		exit(EXIT_FAILURE);
 	}
 
 	if(atoi(argv[2]) < 1) {
-		fprintf(stderr, "ERROR: Invalid port");
+		fprintf(stderr, "ERROR: Invalid port\n");
 	}
 
 	fflush(stderr);
@@ -23,14 +23,14 @@ int main(int argc, char** argv){
 
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
-        fprintf(stderr,"socket failed"); 
+        fprintf(stderr,"ERROR: SOcket connection failure\n"); 
         fflush(stderr);
 		exit(EXIT_FAILURE);
     }
 
 	/** Begin User functionality **/
 
-	
+
 
 	return 0; 
 	

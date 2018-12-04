@@ -164,43 +164,43 @@ int Quit() {
  */
 int returnError(int code) {
     if (code == 0) {
-        fprintf(stderr, "ERROR: Invalid account name - 0 to 255 characters only");
-        fprintf(stdout, "ERROR: Invalid account name - 0 to 255 characters only");
+        fprintf(stderr, "ERROR: Invalid account name - 0 to 255 characters only\n");
+        fprintf(stdout, "ERROR: Invalid account name - 0 to 255 characters only\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 1) {
-        fprintf(stderr, "ERROR: Duplicate account name");
-        fprintf(stdout, "ERROR: Duplicate account name");
+        fprintf(stderr, "ERROR: Duplicate account name\n");
+        fprintf(stdout, "ERROR: Duplicate account name\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 2) {
-        fprintf(stderr, "ERROR: No accounts created");
-        fprintf(stdout, "ERROR: No accounts created");
+        fprintf(stderr, "ERROR: No accounts created\n");
+        fprintf(stdout, "ERROR: No accounts created\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 3) {
-        fprintf(stderr, "ERROR: Account not found");
-        fprintf(stdout, "ERROR: Account not found");
+        fprintf(stderr, "ERROR: Account not found\n");
+        fprintf(stdout, "ERROR: Account not found\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 4) {
-        fprintf(stderr, "ERROR: Active account not found");
-        fprintf(stdout, "ERROR: Active account not found");
+        fprintf(stderr, "ERROR: Active account not found\n");
+        fprintf(stdout, "ERROR: Active account not found\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 10) {
-        fprintf(stderr, "ERROR: Invalid amount - please enter a positive decimal value");
-        fprintf(stdout, "ERROR: Invalid amount - please enter a positive decimal value");
+        fprintf(stderr, "ERROR: Invalid amount - please enter a positive decimal value\n");
+        fprintf(stdout, "ERROR: Invalid amount - please enter a positive decimal value\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 11) {
-        fprintf(stderr, "ERROR: Invalid transaction - reuqeust exceeds account funds");
-        fprintf(stdout, "ERROR: Invalid transaction - reuqeust exceeds account funds");
+        fprintf(stderr, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
+        fprintf(stdout, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 69) {
-        fprintf(stderr, "ERROR: Unable to allocate enough memory");
-        fprintf(stdout, "ERROR: Memory allocation failure");
+        fprintf(stderr, "ERROR: Unable to allocate enough memory\n");
+        fprintf(stdout, "ERROR: Memory allocation failure\n");
         fflush(stderr); fflush(stdout);
         return 0;
     }
