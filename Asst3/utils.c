@@ -200,7 +200,8 @@ int returnError(int code) {
         return 0;
     } else if (code == 69) {
         fprintf(stderr, "ERROR: Unable to allocate enough memory");
-        fflush(stderr);
+        fprintf(stdout, "ERROR: Memory allocation failure");
+        fflush(stderr); fflush(stdout);
         return 0;
     }
 
