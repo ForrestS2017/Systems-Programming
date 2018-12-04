@@ -26,7 +26,7 @@ int CreateAccount(char * accountName) {
     if (!newAccount) return returnError(69);
     newAccount->name = (char*) malloc(255 * sizeof(char));
     newAccount->name = accountName;
-    newAccount->balance = 0;
+    newAccount->balance = 0.0;
     newAccount->session = 0;
 
     Node* newNode = (Node*) malloc(sizeof(Node));
@@ -166,6 +166,7 @@ int PrintAccounts() {
     // Begin printing lists
     Node* temp = Accounts;
     while (temp) {
+
         fprintf(stderr, "Account: %s\nBalance: %lf\n\n", temp->account->name, temp->account->balance);
     }
 
