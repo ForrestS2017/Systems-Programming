@@ -58,5 +58,8 @@ int End();
 // Quit program
 int Quit();
 
+// Print all account information
+int PrintAccounts();
+
 // Throw errors easily
 int returnError(int);

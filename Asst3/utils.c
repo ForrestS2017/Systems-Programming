@@ -155,6 +155,24 @@ int Quit() {
 }
 
 /**
+ * PrintAccounts - Quit program
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+int PrintAccounts() {
+    // Error checking
+    if (Accounts == NULL) return returnError(2);
+
+    // Begin printing lists
+    Node* temp = Accounts;
+    while (temp) {
+        fprintf(stderr, "Account: %s\nBalance: %lf\n\n", temp->account->name, temp->account->balance);
+    }
+
+    return 1;
+}
+
+/**
  * returnError - Print errors and return 0 because I'm lazy
  * 
  * @param code{Account Name, Deposit Amount}
