@@ -154,6 +154,17 @@ int End() {
  * @return 1 if successful, 0 if failure
  */
 int Quit() {
+    // Free all nodes
+    if (Accounts) {
+        Node* temp = Accounts;
+        Node* prev;
+        while (temp != NULL) {
+            prev = temp;
+            temp = temp->next;
+            if(prev) free(prev);
+        }
+    }
+
     fprintf(stdout, "Connection terminated\n", activeAccount->name);
     fflush(stdout);
     return 1;
@@ -188,12 +199,48 @@ int PrintAccounts() {
  * @return 1 if successful, 0 if failure
  */
 int getUserInput() {
+    // Get initial command
     printf("Valid commands: create, serve, quit\n");
-    char userInput[300];
+    char command[10];
+    char userInput[255];
 
-    
+    sscanf("%s %s", command, userInput);
+    const* cmd0[3] = {"create", "serve", "quit"};
+    const* cmd1[5] = {"serve", "deposit", "withdraw", "end", "quit"};
 
+    // Error check
+    if(command == NULL || userInput == NULL) return returnError(70);
 
+    int state = 0;  // Check if we are pre-serve (0) or serving (1) or have quit (-1)
+
+    // While we have not quit, loop per active client
+    while(state > -1) {
+        if ((strcmp(command, "create") == 0) && state == 0) {
+            state = 0;
+
+        } else if ((strcmp(command, "serve") == 0) && state == 0) {
+            state = 0;
+
+        } else if ((strcmp(command, "deposit") == 0) && state == 1) {
+            state = 0;
+
+        } else if ((strcmp(command, "withdraw") == 0) && state == 1) {
+            state = 0;
+
+        } else if ((strcmp(command, "end") == 0) && state == 1){
+            state = 0;
+
+        } else if (strcmp(command, "quit") == 0) {
+            state = -1;
+
+        } else {
+            // User input command at invalid time
+            return returnError(71);
+        }
+    }
+
+    // If out of loop, user quit session
+    return 1;
 }
 
 /**
@@ -243,8 +290,16 @@ int returnError(int code) {
         fprintf(stdout, "ERROR: Memory allocation failure\n");
         fflush(stderr); fflush(stdout);
         return 0;
-    }
+    } else if (code == 70) {
+        fprintf(stderr, "ERROR: Input format is <command> <name/amount>\n");
+        fprintf(stdout, "ERROR: Input format is <command> <name/amount>\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
+    }  else if (code == 71) {
+        fprintf(stderr, "ERROR: You may only create and serve an account if you are not already serving an account.\n You may only deposit and withdraw while you are serving an account.\n");
+        fprintf(stdout, "ERROR: You may only create and serve an account if you are not already serving an account.\n You may only deposit and withdraw while you are serving an account.\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
 
     return 0;
 }
-
