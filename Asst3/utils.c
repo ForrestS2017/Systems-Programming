@@ -10,8 +10,7 @@
  */
 int CreateAccount(char * accountName) {
     // Error checking (no name, name length, duplicate account)
-    if (accountName == NULL) return returnError(0);
-    if (strlen(accountName) > 255) return returnError(0);
+    if (accountName == NULL || strlen(accountName) > 255) return returnError(0);
     if (Accounts) {
         Node* temp = Accounts;
         while (temp->next != NULL) {
@@ -58,8 +57,7 @@ int CreateAccount(char * accountName) {
  */
 int ServeAccount(char * accountName) {
     // Error checking (no name, name length)
-    if (accountName == NULL) return returnError(0);
-    if (strlen(accountName) > 255) return returnError(0);
+    if (accountName == NULL || strlen(accountName) > 255) return returnError(0);
     if (Accounts == NULL) return returnError(2);
 
     if (Accounts) {
