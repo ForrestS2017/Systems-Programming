@@ -127,7 +127,7 @@ double Query() {
     if (activeAccount == NULL) return returnError(4);
 
     // Return active account balance
-    fprintf(stdout, "Balance for account %s: %lf", activeAccount->name, activeAccount->balance);
+    fprintf(stdout, "Balance for account %s: %lf\n", activeAccount->name, activeAccount->balance);
     fflush(stdout);
     return activeAccount->balance;
 }
@@ -138,7 +138,7 @@ double Query() {
  * @return 1 if successful, 0 if failure
  */
 int End() {
-    fprintf(stdout, "Session terminated for account %s", activeAccount->name);
+    fprintf(stdout, "Session terminated for account %s\n", activeAccount->name);
     fflush(stdout);
     return 1;
 }
@@ -149,7 +149,7 @@ int End() {
  * @return 1 if successful, 0 if failure
  */
 int Quit() {
-    fprintf(stdout, "Connection terminated", activeAccount->name);
+    fprintf(stdout, "Connection terminated\n", activeAccount->name);
     fflush(stdout);
     return 1;
 }
