@@ -29,6 +29,8 @@ int main(int argc, char** argv){
     }
 
 	/** Begin User functionality **/
+	// Thread for user input and server response
+
 
 
 

@@ -1,0 +1,6 @@
+Developers:
+	Justin Chan
+	Forrest Smith
+
+
+*IN SESSION - Give each user a unique ID to set to the session flag

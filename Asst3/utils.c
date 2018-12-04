@@ -1,4 +1,9 @@
+#include "bankingServer.h"
 #include "bankingClient.h"
+
+/**                          **/
+/** BANKING SERVER FUNCTIONS **/
+/**                          **/
 
 /**
  * CreateAccount - Creates _Account struct with name and starting balance
@@ -27,7 +32,7 @@ int CreateAccount(char * accountName) {
     newAccount->name = (char*) malloc(255 * sizeof(char));
     newAccount->name = accountName;
     newAccount->balance = 0.0;
-    newAccount->session = 0;
+    newAccount->session = NULL;     // TODO - create unique FLAG
 
     Node* newNode = (Node*) malloc(sizeof(Node));
     if (!newNode) return returnError(69);
@@ -171,6 +176,24 @@ int PrintAccounts() {
     }
 
     return 1;
+}
+
+/**                          **/
+/** BANKING CLIENT FUNCTIONS **/
+/**                          **/
+
+/**
+ * getUserInput - Loop to read user standard input
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+int getUserInput() {
+    printf("Valid commands: create, serve, quit\n");
+    char userInput[300];
+
+    
+
+
 }
 
 /**
