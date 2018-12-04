@@ -26,7 +26,11 @@ int main(int argc, char** argv){
         fprintf(stderr,"socket failed"); 
         fflush(stderr);
 		exit(EXIT_FAILURE);
-    } 
+    }
+
+	/** Begin User functionality **/
+
+	
 
 	return 0; 
 	

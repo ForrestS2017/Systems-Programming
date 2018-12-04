@@ -19,7 +19,7 @@
 
 // Basic data stucture for user accounts
 typedef struct _Account {
-    char name[255];
+    char* name;
     double balance;
     int session;
 
@@ -31,12 +31,13 @@ typedef struct _Node {
     struct _Node* next;
 } Node;
 
-// Linked list of accounts
+// References (linked list, active account)
 Node* Accounts;
+Account* activeAccount;
 
 /** Functions **/
 
-// Creates new unique accounts
+// Creates new unique accounts to add to Node* Accounts
 int CreateAccount(char *);
 
 // Enables session to deposit to and withdraw from accounts
@@ -56,3 +57,6 @@ int End();
 
 // Quit program
 int Quit();
+
+// Throw errors easily
+int returnError(int);

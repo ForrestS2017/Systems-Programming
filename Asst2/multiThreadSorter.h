@@ -26,7 +26,7 @@ typedef struct _Header
     char **titles; // Hold the titles of each column
     format *types; // Declare the types of each column, corresponds with row entry
 } Header;
-
+CC, NS, SCL, HST, AH, WC, WCr, WCd, QQ, QR, ITR
 typedef struct _Row
 {
     char **entries; // Hold each entry of the row. The type of each corresponds to format enum
