@@ -155,7 +155,7 @@ int Quit() {
 }
 
 /**
- * PrintAccounts - Quit program
+ * PrintAccounts - Print all account metadata
  * 
  * @return 1 if successful, 0 if failure
  */
