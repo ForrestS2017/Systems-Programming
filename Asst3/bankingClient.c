@@ -17,21 +17,28 @@ int main(int argc, char** argv){
 
 	fflush(stderr);
 
-	// Begin server functionality
+	/** Begin server functionality **/
+	
 	int port = atoi(argv[2]);
 	int server_fd, new_socket, valread;
 
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
-        fprintf(stderr,"ERROR: SOcket connection failure\n"); 
+        fprintf(stderr,"ERROR: Socket connection failure\n"); 
         fflush(stderr);
 		exit(EXIT_FAILURE);
     }
 
 	/** Begin User functionality **/
+
 	// Thread for user input and server response
+	pthread_t userIn;
+	int success = pthread_create(&userIn, NULL, getUserInput, NULL);
+	if (success != 0) return returnError(68);
 
-
+	pthread_t serverOut;
+	int success = pthread_create(&serverOut, NULL, getServerOutput(), NULL);
+	if (success != 0) return returnError(68);
 
 
 	return 0; 

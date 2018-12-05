@@ -21,4 +21,6 @@
 /** Functions **/
 
 // Get user input in a loop
-int getUserInput();
+void* getUserInput();
+
+void* getServerOutput();

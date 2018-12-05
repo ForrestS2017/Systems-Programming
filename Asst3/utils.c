@@ -198,7 +198,7 @@ int PrintAccounts() {
  * 
  * @return 1 if successful, 0 if failure
  */
-int getUserInput() {
+void* getUserInput() {
     // Get initial command
     printf("Valid commands: create, serve, quit\n");
     char command[10];
@@ -211,7 +211,7 @@ int getUserInput() {
     // Error check
     if(command == NULL || userInput == NULL) return returnError(70);
 
-    int state = 0;  // Check if we are pre-serve (0) or serving (1) or have quit (-1)
+    int state = 0;  // 0 = Pre-serve, 1 = Serving, -1 = Quit
 
     // While we have not quit, loop per active client
     while(state > -1) {
@@ -219,7 +219,7 @@ int getUserInput() {
             state = 0;
 
         } else if ((strcmp(command, "serve") == 0) && state == 0) {
-            state = 0;
+            state = 1;
 
         } else if ((strcmp(command, "deposit") == 0) && state == 1) {
             state = 0;
@@ -235,16 +235,28 @@ int getUserInput() {
 
         } else {
             // User input command at invalid time
-            return returnError(71);
+            returnError(71);
         }
     }
 
     // If out of loop, user quit session
-    return 1;
+    return (void*) (size_t) 1;
+}
+
+/**
+ * getServerOutput - Print account information ever 20 seconds
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+void* getServerOutput() {
+    // TODO
+    return (void*) (size_t) 1;
 }
 
 /**
  * returnError - Print errors and return 0 because I'm lazy
+ * 
+ * 0-9 = Account creation | 10 - 19 = Withdraw/Deposit | 60 - 69 = Runtime error | 70 - 79 = Formatting
  * 
  * @param code{Account Name, Deposit Amount}
  * @return 0 only
@@ -283,6 +295,11 @@ int returnError(int code) {
     } else if (code == 11) {
         fprintf(stderr, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
         fprintf(stdout, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
+    } else if (code == 68) {
+        fprintf(stderr, "ERROR: Unable to create thread\n");
+        fprintf(stdout, "ERROR: Unable to create thread\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 69) {
