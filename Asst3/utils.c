@@ -244,6 +244,23 @@ void* getUserInput() {
 }
 
 /**
+ * setTimer - Print account information every 15 seconds
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+int setTimer(int seconds){
+  // Print first set of accounts (should be none)
+  PrintAccounts();
+  // Set timer to keep printing
+  struct itimerval new;
+  new.it_interval.tv_usec = 0;
+  new.it_interval.tv_sec = 0;
+  new.it_value.tv_usec = 0;
+  new.it_value.tv_sec = (long int) seconds; 
+  if (setitimer(ITIMER_REAL, &new, 0) < 0) return 0;
+}
+
+/**
  * getServerOutput - Print account information ever 20 seconds
  * 
  * @return 1 if successful, 0 if failure

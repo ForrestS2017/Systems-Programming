@@ -30,6 +30,7 @@ int main(int argc, char** argv){
     }
 
 	/** Begin User functionality **/
+	getUserInput();
 
 	// Thread for user input and server response
 	pthread_t userIn;

@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <sys/socket.h> 
 #include <sys/types.h>
+#include <sys/time.h>
 #include <netinet/in.h> 
 #include <netdb.h> 
 
@@ -68,3 +69,6 @@ int PrintAccounts();
 
 // Throw errors easily
 int returnError(int);
+
+// Set timer to print account data
+int setTimer(int);
