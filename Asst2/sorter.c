@@ -389,7 +389,7 @@ void* directoryHandler(void* args) {
     
     pthread_mutex_lock(&_printLock);
     int pid = getpid();
-    fprintf(stdout, "\nInitial PID: %d\nTIDS of all spawned threads:", pid);
+    fprintf(stdout, "\nInitial PID: %d\nTIDS of all spawned threads: ", pid);
     for (cTID = 1; cTID <= threads; cTID++) {
         fprintf(stdout, "%d", cTID);
         if (cTID < threads) fprintf(stdout, ", ");
