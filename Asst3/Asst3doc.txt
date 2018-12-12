@@ -3,4 +3,5 @@ Developers:
 	Forrest Smith
 
 
-*IN SESSION - Give each user a unique ID to set to the session flag
+The project creates a thread for the user input, and receiving the timed server printing.
+Each unique client session spawns a new thread.

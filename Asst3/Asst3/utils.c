@@ -1,4 +1,9 @@
+#include "bankingServer.h"
 #include "bankingClient.h"
+
+/**                          **/
+/** BANKING SERVER FUNCTIONS **/
+/**                          **/
 
 /**
  * CreateAccount - Creates _Account struct with name and starting balance
@@ -22,12 +27,13 @@ int CreateAccount(char * accountName) {
     }
 
     // Create account object and node
+    pthread_mutex_lock(&_AccountsLock);
     Account* newAccount = (Account*) malloc(sizeof(Account));
     if (!newAccount) return returnError(69);
     newAccount->name = (char*) malloc(255 * sizeof(char));
     newAccount->name = accountName;
     newAccount->balance = 0.0;
-    newAccount->session = 0;
+    newAccount->session = NULL;     // TODO - create unique FLAG
 
     Node* newNode = (Node*) malloc(sizeof(Node));
     if (!newNode) return returnError(69);
@@ -44,6 +50,7 @@ int CreateAccount(char * accountName) {
         }
         temp->next = newNode;
     }
+    pthread_mutex_unlock(&_AccountsLock);
 
     // Return 1 upon successful creation
     return 1;
@@ -148,14 +155,26 @@ int End() {
  * 
  * @return 1 if successful, 0 if failure
  */
-int Quit() {
-    fprintf(stdout, "Connection terminated\n", activeAccount->name);
+void Quit() {
+    // Free all nodes
+    if (Accounts) {
+        Node* temp = Accounts;
+        Node* prev;
+        while (temp != NULL) {
+            prev = temp;
+            temp = temp->next;
+            if(prev) free(prev);
+        }
+    }
+
+    fprintf(stdout, "Session complete - Connection terminated\n", activeAccount->name);
     fflush(stdout);
-    return 1;
+    exit(0);
 }
 
 /**
- * PrintAccounts - Print all account metadata
+ * PrintAccounts - Print all account metadata. 
+ *                 DON'T FORGET TO LOCK
  * 
  * @return 1 if successful, 0 if failure
  */
@@ -164,17 +183,126 @@ int PrintAccounts() {
     if (Accounts == NULL) return returnError(2);
 
     // Begin printing lists
+    pthread_mutex_lock(&_AccountsLock);
     Node* temp = Accounts;
     while (temp) {
 
         fprintf(stderr, "Account: %s\nBalance: %lf\n\n", temp->account->name, temp->account->balance);
     }
+    free(temp);
+    pthread_mutex_unlock(&_AccountsLock);
 
     return 1;
 }
 
 /**
+ * setTimer - Print account information every 15 seconds
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+int setTimer(int seconds){
+    // Print first set of accounts (should be none)
+    PrintAccounts();
+    // Set timer to keep printing
+    struct itimerval new;
+    new.it_interval.tv_usec = 0;
+    new.it_interval.tv_sec = 0;
+    new.it_value.tv_usec = 0;
+    new.it_value.tv_sec = (long int) seconds; 
+    if (setitimer(ITIMER_REAL, &new, 0) < 0) return 0;
+}
+
+/**                          **/
+/** BANKING CLIENT FUNCTIONS **/
+/**                          **/
+
+/**
+ * getUserInput - Loop to read user standard input
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+void* getUserInput(void* arguments) {
+    // Get initial command
+    int socketfd = * (int*) arguments;
+    char command[11];
+    char userInput[255];
+
+    int state = 0;  // 0 = Pre-serve, 1 = Serving, -1 = Quit
+
+    // While we have not quit, loop per active client
+    while(state > -1) {
+        // Prompt user
+        command[0] = '\0';
+        userInput[0] = '\0';
+        fprintf(stdout,"Enter commands\n");
+        sscanf("%s %s", command, userInput);
+        // Error check
+        if(strlen(command) == 0 || strlen(userInput) == 0) return returnError(70);
+
+        // Call commands
+        if ((strcmp(command, "create") == 0) && state == 0) {
+            state = 0;
+            
+            // createAccount()
+
+        } else if ((strcmp(command, "serve") == 0) && state == 0) {
+            state = 1;
+
+            // ServeAccount()
+
+        } else if ((strcmp(command, "deposit") == 0) && state == 1) {
+            state = 0;
+            // Check if user input is float
+            // DepositAccount()
+
+        } else if ((strcmp(command, "withdraw") == 0) && state == 1) {
+            state = 0;
+            // Check if user input is float
+            // WithdrawAccount()
+
+        } else if ((strcmp(command, "end") == 0) && state == 1){
+            state = 0;
+
+            // End()
+
+        } else if (strcmp(command, "quit") == 0) {
+            state = -1;
+
+            // Quit()
+
+        } else {
+            // User input command at invalid time
+            returnError(71);
+        }
+    }
+
+    // If out of loop, user quit session
+    return (void*) (size_t) 1;
+}
+
+/**
+ * getServerOutput - Print account information ever 20 seconds
+ * 
+ * @return 1 if successful, 0 if failure
+ */
+void* getServerOutput(void* arguments) {
+    // TODO
+    if (arguments == NULL) return returnError(50);
+
+    int socketfd = * (int*) arguments;
+    char response[1000];
+
+    int byte = 1;
+
+    // TODO: read server response somehow
+
+    return (void*) (size_t) 1;
+}
+
+/**
  * returnError - Print errors and return 0 because I'm lazy
+ * 
+ * 0-9 = Account creation | 10 - 19 = Withdraw/Deposit | 50-59 = Server errors | 60 - 69 = Runtime error | 70 - 79 = Formatting 
  * 
  * @param code{Account Name, Deposit Amount}
  * @return 0 only
@@ -215,13 +343,31 @@ int returnError(int code) {
         fprintf(stdout, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
         fflush(stderr); fflush(stdout);
         return 0;
+    } else if (code == 50) {
+        fprintf(stderr, "ERROR: Could not pass arguments to server\n");
+        fprintf(stdout, "ERROR: Could not pass arguments to server\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
+    } else if (code == 68) {
+        fprintf(stderr, "ERROR: Unable to create thread\n");
+        fprintf(stdout, "ERROR: Unable to create thread\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
     } else if (code == 69) {
         fprintf(stderr, "ERROR: Unable to allocate enough memory\n");
         fprintf(stdout, "ERROR: Memory allocation failure\n");
         fflush(stderr); fflush(stdout);
         return 0;
-    }
+    } else if (code == 70) {
+        fprintf(stderr, "ERROR: Input format is <command> <name/amount>\n");
+        fprintf(stdout, "ERROR: Input format is <command> <name/amount>\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
+    }  else if (code == 71) {
+        fprintf(stderr, "ERROR: You may only create and serve an account if you are not already serving an account.\n You may only deposit and withdraw while you are serving an account.\n");
+        fprintf(stdout, "ERROR: You may only create and serve an account if you are not already serving an account.\n You may only deposit and withdraw while you are serving an account.\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
 
     return 0;
 }
-
