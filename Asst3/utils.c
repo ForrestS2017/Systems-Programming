@@ -27,6 +27,7 @@ int CreateAccount(char * accountName) {
     }
 
     // Create account object and node
+    pthread_mutex_lock(&_AccountsLock);
     Account* newAccount = (Account*) malloc(sizeof(Account));
     if (!newAccount) return returnError(69);
     newAccount->name = (char*) malloc(255 * sizeof(char));
@@ -49,6 +50,7 @@ int CreateAccount(char * accountName) {
         }
         temp->next = newNode;
     }
+    pthread_mutex_unlock(&_AccountsLock);
 
     // Return 1 upon successful creation
     return 1;
@@ -171,7 +173,8 @@ void Quit() {
 }
 
 /**
- * PrintAccounts - Print all account metadata. Should be mutexed
+ * PrintAccounts - Print all account metadata. 
+ *                 DON'T FORGET TO LOCK
  * 
  * @return 1 if successful, 0 if failure
  */
@@ -180,12 +183,14 @@ int PrintAccounts() {
     if (Accounts == NULL) return returnError(2);
 
     // Begin printing lists
+    pthread_mutex_lock(&_AccountsLock);
     Node* temp = Accounts;
     while (temp) {
 
         fprintf(stderr, "Account: %s\nBalance: %lf\n\n", temp->account->name, temp->account->balance);
     }
     free(temp);
+    pthread_mutex_unlock(&_AccountsLock);
 
     return 1;
 }
