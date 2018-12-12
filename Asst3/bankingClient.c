@@ -51,11 +51,11 @@ int main(int argc, char** argv){
 	 * 
 	 */
 
-	/** Begin User functionality **/
+	/** Begin Client functionality **/
 
 	// Thread for user input and server response
 	pthread_t userIn;
-	int success = pthread_create(&userIn, NULL, getUserInput, NULL);
+	int success = pthread_create(&userIn, NULL, getUserInput, &socket_fd);
 	if (success != 0) return returnError(68);
 
 	pthread_t serverOut;

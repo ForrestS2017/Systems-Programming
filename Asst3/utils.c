@@ -216,40 +216,54 @@ int setTimer(int seconds){
  * 
  * @return 1 if successful, 0 if failure
  */
-void* getUserInput() {
+void* getUserInput(void* arguments) {
     // Get initial command
-    printf("Valid commands: create, serve, quit\n");
-    char command[10];
+    int socketfd = * (int*) arguments;
+    char command[11];
     char userInput[255];
-
-    sscanf("%s %s", command, userInput);
-    const* cmd0[3] = {"create", "serve", "quit"};
-    const* cmd1[5] = {"serve", "deposit", "withdraw", "end", "quit"};
-
-    // Error check
-    if(command == NULL || userInput == NULL) return returnError(70);
 
     int state = 0;  // 0 = Pre-serve, 1 = Serving, -1 = Quit
 
     // While we have not quit, loop per active client
     while(state > -1) {
+        // Prompt user
+        command[0] = '\0';
+        userInput[0] = '\0';
+        fprintf(stdout,"Enter commands\n");
+        sscanf("%s %s", command, userInput);
+        // Error check
+        if(strlen(command) == 0 || strlen(userInput) == 0) return returnError(70);
+
+        // Call commands
         if ((strcmp(command, "create") == 0) && state == 0) {
             state = 0;
+            
+            // createAccount()
 
         } else if ((strcmp(command, "serve") == 0) && state == 0) {
             state = 1;
 
+            // ServeAccount()
+
         } else if ((strcmp(command, "deposit") == 0) && state == 1) {
             state = 0;
+            // Check if user input is float
+            // DepositAccount()
 
         } else if ((strcmp(command, "withdraw") == 0) && state == 1) {
             state = 0;
+            // Check if user input is float
+            // WithdrawAccount()
 
         } else if ((strcmp(command, "end") == 0) && state == 1){
             state = 0;
 
+            // End()
+
         } else if (strcmp(command, "quit") == 0) {
             state = -1;
+
+            // Quit()
 
         } else {
             // User input command at invalid time
@@ -275,10 +289,7 @@ void* getServerOutput(void* arguments) {
 
     int byte = 1;
 
-    while(byte) {
-        byte = read(socketfd, response, 1000);
-    }
-    fprintf(stdout, "%s\n", response);
+    // TODO: read server response somehow
 
     return (void*) (size_t) 1;
 }
