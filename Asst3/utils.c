@@ -165,7 +165,7 @@ void Quit() {
         }
     }
 
-    fprintf(stdout, "Connection terminated\n", activeAccount->name);
+    fprintf(stdout, "Session complete - Connection terminated\n", activeAccount->name);
     fflush(stdout);
     exit(0);
 }

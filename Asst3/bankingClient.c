@@ -45,11 +45,13 @@ int main(int argc, char** argv){
 	server.sin_port = htons(port);
 
 	// Connection
-	// TODO
-
+	
+	/**
+	 * TODO: CONNECT TO SERVER
+	 * 
+	 */
 
 	/** Begin User functionality **/
-	getUserInput();
 
 	// Thread for user input and server response
 	pthread_t userIn;
@@ -63,8 +65,9 @@ int main(int argc, char** argv){
 	pthread_join(userIn, NULL);
 	pthread_join(serverOut, NULL);
 
-	fprintf(stdout, "Session completed");
-	
+	fprintf(stdout, "Session completed - Connection terminated\n");
+	fflush(stdout);
+
 	return 0; 
 	
 }
