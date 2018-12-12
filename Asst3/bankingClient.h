@@ -23,4 +23,4 @@
 // Get user input in a loop
 void* getUserInput();
 
-void* getServerOutput();
+void* getServerOutput(void*);

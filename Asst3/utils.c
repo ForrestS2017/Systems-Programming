@@ -153,7 +153,7 @@ int End() {
  * 
  * @return 1 if successful, 0 if failure
  */
-int Quit() {
+void Quit() {
     // Free all nodes
     if (Accounts) {
         Node* temp = Accounts;
@@ -167,11 +167,11 @@ int Quit() {
 
     fprintf(stdout, "Connection terminated\n", activeAccount->name);
     fflush(stdout);
-    return 1;
+    exit(0);
 }
 
 /**
- * PrintAccounts - Print all account metadata
+ * PrintAccounts - Print all account metadata. Should be mutexed
  * 
  * @return 1 if successful, 0 if failure
  */
@@ -185,6 +185,7 @@ int PrintAccounts() {
 
         fprintf(stderr, "Account: %s\nBalance: %lf\n\n", temp->account->name, temp->account->balance);
     }
+    free(temp);
 
     return 1;
 }
@@ -265,15 +266,27 @@ void* getUserInput() {
  * 
  * @return 1 if successful, 0 if failure
  */
-void* getServerOutput() {
+void* getServerOutput(void* arguments) {
     // TODO
+    if (arguments == NULL) return returnError(50);
+
+    int socketfd = * (int*) arguments;
+    char response[1000];
+
+    int byte = 1;
+
+    while(byte) {
+        byte = read(socketfd, response, 1000);
+    }
+    fprintf(stdout, "%s\n", response);
+
     return (void*) (size_t) 1;
 }
 
 /**
  * returnError - Print errors and return 0 because I'm lazy
  * 
- * 0-9 = Account creation | 10 - 19 = Withdraw/Deposit | 60 - 69 = Runtime error | 70 - 79 = Formatting
+ * 0-9 = Account creation | 10 - 19 = Withdraw/Deposit | 50-59 = Server errors | 60 - 69 = Runtime error | 70 - 79 = Formatting 
  * 
  * @param code{Account Name, Deposit Amount}
  * @return 0 only
@@ -312,6 +325,11 @@ int returnError(int code) {
     } else if (code == 11) {
         fprintf(stderr, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
         fprintf(stdout, "ERROR: Invalid transaction - reuqeust exceeds account funds\n");
+        fflush(stderr); fflush(stdout);
+        return 0;
+    } else if (code == 50) {
+        fprintf(stderr, "ERROR: Could not pass arguments to server\n");
+        fprintf(stdout, "ERROR: Could not pass arguments to server\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 68) {

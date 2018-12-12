@@ -62,7 +62,7 @@ double Query();
 int End();
 
 // Quit program
-int Quit();
+void Quit();
 
 // Print all account information
 int PrintAccounts();

@@ -20,14 +20,33 @@ int main(int argc, char** argv){
 	/** Begin server functionality **/
 	
 	int port = atoi(argv[2]);
-	int server_fd, new_socket, valread;
+	int socket_fd, new_socket, valread;
 
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
-    { 
+	// Socket
+	if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) { 
         fprintf(stderr,"ERROR: Socket connection failure\n"); 
         fflush(stderr);
 		exit(EXIT_FAILURE);
     }
+
+	// Host
+	struct hostent *hostentry;
+
+	if((hostentry = gethostbyname(argv[1])) == NULL) {
+        fprintf(stderr,"ERROR: Could not retrieve specified host\n"); 
+        fflush(stderr);
+		exit(EXIT_FAILURE);
+	}
+
+	// Server
+	struct sockaddr_in server;
+	server.sin_family = AF_INET;
+	memcpy(&server.sin_addr, hostentry->h_addr_list[0], hostentry->h_length);
+	server.sin_port = htons(port);
+
+	// Connection
+	// TODO
+
 
 	/** Begin User functionality **/
 	getUserInput();
@@ -38,10 +57,14 @@ int main(int argc, char** argv){
 	if (success != 0) return returnError(68);
 
 	pthread_t serverOut;
-	int success = pthread_create(&serverOut, NULL, getServerOutput(), NULL);
+	int success = pthread_create(&serverOut, NULL, getServerOutput, &socket_fd);
 	if (success != 0) return returnError(68);
 
+	pthread_join(userIn, NULL);
+	pthread_join(serverOut, NULL);
 
+	fprintf(stdout, "Session completed");
+	
 	return 0; 
 	
 }
