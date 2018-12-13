@@ -15,7 +15,7 @@
  */
 int CreateAccount(char * accountName) {
     // Error checking (no name, name length, duplicate account)
-    if (accountName == NULL || strlen(accountName) > 255) return returnError(0);
+    if (accountName == NULL || strlen(accountName) > 255 || strcmp(accountName, "") == 0) return returnError(0);
     if (Accounts) {
         Node* temp = Accounts;
         while (temp->next != NULL) {
@@ -314,8 +314,8 @@ void* getServerOutput(void* arguments) {
  */
 int returnError(int code) {
     if (code == 0) {
-        fprintf(stderr, "ERROR: Invalid account name - 0 to 255 characters only\n");
-        fprintf(stdout, "ERROR: Invalid account name - 0 to 255 characters only\n");
+        fprintf(stderr, "ERROR: Invalid account name - 1 to 255 characters only\n");
+        fprintf(stdout, "ERROR: Invalid account name - 1 to 255 characters only\n");
         fflush(stderr); fflush(stdout);
         return 0;
     } else if (code == 1) {
