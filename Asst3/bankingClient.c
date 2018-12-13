@@ -20,7 +20,7 @@ int main(int argc, char** argv){
 	/** Begin server functionality **/
 	
 	int port = atoi(argv[2]);
-	int socket_fd, new_socket, valread;
+	int socket_fd/*, new_socket, valread*/;
 
 	// Socket
 	if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) { 
@@ -59,8 +59,8 @@ int main(int argc, char** argv){
 	if (success != 0) return returnError(68);
 
 	pthread_t serverOut;
-	int success = pthread_create(&serverOut, NULL, getServerOutput, &socket_fd);
-	if (success != 0) return returnError(68);
+	int success2 = pthread_create(&serverOut, NULL, getServerOutput, &socket_fd);
+	if (success2 != 0) return returnError(68);
 
 	pthread_join(userIn, NULL);
 	pthread_join(serverOut, NULL);

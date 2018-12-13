@@ -19,11 +19,13 @@
 
 /** Structs **/
 
+typedef enum _boolean { FALSE=0, TRUE=1 } boolean;
+
 // Basic data stucture for user accounts
 typedef struct _Account {
     char* name;
     double balance;
-    char* session;
+    boolean session;
 
 } Account;
 

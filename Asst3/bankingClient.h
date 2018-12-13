@@ -25,3 +25,5 @@
 void* getUserInput(void*);
 
 void* getServerOutput(void*);
+
+int returnError(int);

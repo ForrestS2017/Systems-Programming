@@ -33,7 +33,7 @@ int CreateAccount(char * accountName) {
     newAccount->name = (char*) malloc(255 * sizeof(char));
     newAccount->name = accountName;
     newAccount->balance = 0.0;
-    newAccount->session = NULL;     // TODO - create unique FLAG
+    newAccount->session = FALSE;     // TODO - create unique FLAG
 
     Node* newNode = (Node*) malloc(sizeof(Node));
     if (!newNode) return returnError(69);
@@ -71,14 +71,14 @@ int ServeAccount(char * accountName) {
         Node* temp = Accounts;
         while (temp->next != NULL) {
             if (strcmp(temp->account->name, accountName) == 0) {
-                activeAccount = temp;
+                activeAccount = temp->account;
             }
             temp = temp->next;
         }
     }
 
-    if (activeAccount = NULL) return returnError(3);
-    activeAccount->session = 1;
+    if (activeAccount == NULL) return returnError(3);
+    activeAccount->session = TRUE;
 
     return 1;
 }
@@ -91,7 +91,7 @@ int ServeAccount(char * accountName) {
  */
 int DepositAccount(double fund) {
     // Error checking
-    if (fund < 1.0) return Error(10);
+    if (fund <= 0.0) return returnError(10);
     if (Accounts == NULL) return returnError(2);
     if (activeAccount == NULL) return returnError(4);
 
@@ -109,13 +109,13 @@ int DepositAccount(double fund) {
  */
 int WithdrawAccount(double fund) {
     // Error checking
-    if (fund < 1.0) return Error(10);
+    if (fund < 1.0) return returnError(10);
     if (Accounts == NULL) return returnError(2);
     if (activeAccount == NULL) return returnError(4);
     
 
     // Prohibit bouncing
-    if (fund > activeAccount->balance) return error(11);
+    if (fund > activeAccount->balance) return returnError(11);
 
     // Withdraw funds
     activeAccount->balance = activeAccount->balance - fund;
@@ -167,7 +167,7 @@ void Quit() {
         }
     }
 
-    fprintf(stdout, "Session complete - Connection terminated\n", activeAccount->name);
+    fprintf(stdout, "Session complete - Connection terminated\n"/*, activeAccount->name*/);
     fflush(stdout);
     exit(0);
 }
@@ -200,7 +200,7 @@ int PrintAccounts() {
  * 
  * @return 1 if successful, 0 if failure
  */
-int setTimer(int seconds){
+int setTimer(int seconds) {
     // Print first set of accounts (should be none)
     PrintAccounts();
     // Set timer to keep printing
@@ -210,6 +210,7 @@ int setTimer(int seconds){
     new.it_value.tv_usec = 0;
     new.it_value.tv_sec = (long int) seconds; 
     if (setitimer(ITIMER_REAL, &new, 0) < 0) return 0;
+    else return 1;
 }
 
 /**                          **/
@@ -223,7 +224,7 @@ int setTimer(int seconds){
  */
 void* getUserInput(void* arguments) {
     // Get initial command
-    int socketfd = * (int*) arguments;
+    //int socketfd = * (int*) arguments;
     char command[11];
     char userInput[255];
 
@@ -237,7 +238,9 @@ void* getUserInput(void* arguments) {
         fprintf(stdout,"Enter commands\n");
         sscanf("%s %s", command, userInput);
         // Error check
-        if(strlen(command) == 0 || strlen(userInput) == 0) return returnError(70);
+        if (strlen(command) == 0 || strlen(userInput) == 0) {
+            returnError(70);
+        }
 
         // Call commands
         if ((strcmp(command, "create") == 0) && state == 0) {
@@ -287,12 +290,14 @@ void* getUserInput(void* arguments) {
  */
 void* getServerOutput(void* arguments) {
     // TODO
-    if (arguments == NULL) return returnError(50);
+    if (arguments == NULL) {
+        returnError(50);
+    }
 
-    int socketfd = * (int*) arguments;
-    char response[1000];
+    //int socketfd = * (int*) arguments;
+    //char response[1000];
 
-    int byte = 1;
+    //int byte = 1;
 
     // TODO: read server response somehow
 
@@ -368,6 +373,6 @@ int returnError(int code) {
         fprintf(stdout, "ERROR: You may only create and serve an account if you are not already serving an account.\n You may only deposit and withdraw while you are serving an account.\n");
         fflush(stderr); fflush(stdout);
         return 0;
-
+    }
     return 0;
 }

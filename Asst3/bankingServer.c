@@ -16,4 +16,5 @@ int main(int argc, char** argv){
 	}
 
 	fflush(stderr);
+    return 0;
 }
