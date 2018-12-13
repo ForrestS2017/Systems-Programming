@@ -232,6 +232,7 @@ void* getUserInput(void* arguments) {
         command[0] = '\0';
         userInput[0] = '\0';
         fprintf(stdout,"Enter commands\n");
+        fgets(userInput, 256, stdin);
         sscanf("%s %s", command, userInput);
         // Error check
         if (strlen(command) == 0 || strlen(userInput) == 0) {
