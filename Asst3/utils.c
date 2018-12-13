@@ -27,30 +27,26 @@ int CreateAccount(char * accountName) {
     }
 
     // Create account object and node
-    pthread_mutex_lock(&_AccountsLock);
     Account* newAccount = (Account*) malloc(sizeof(Account));
-    if (!newAccount) return returnError(69);
-    newAccount->name = (char*) malloc(255 * sizeof(char));
-    newAccount->name = accountName;
-    newAccount->balance = 0.0;
-    newAccount->session = FALSE;     // TODO - create unique FLAG
-
+    if (newAccount == NULL) return returnError(69);
+    
     Node* newNode = (Node*) malloc(sizeof(Node));
-    if (!newNode) return returnError(69);
     newNode->account = newAccount;
     newNode->next = NULL;
+    if (!newNode) return returnError(69);
 
-    // Add to end of Account linked list or add first node
-    Node* temp = Accounts;
-    if (temp == NULL) {
-        Accounts = newNode;
-    } else {
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
+    pthread_mutex_lock(&_AccountsLock);
+    // Add to front of Account linked list or add first node
+    if (Accounts != NULL) {
+        newNode->next = Accounts;
     }
-    pthread_mutex_unlock(&_AccountsLock);
+    Accounts = newNode;
+    pthread_mutex_unlock(&_AccountsLock);   
+    
+    newAccount->name = (char*) malloc((strlen(accountName) + 1) * sizeof(char));
+    strcpy(newAccount->name, accountName);
+    newAccount->balance = 0.0;
+    newAccount->session = FALSE;     // TODO - create unique FLAG
 
     // Return 1 upon successful creation
     return 1;

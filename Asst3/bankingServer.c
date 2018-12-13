@@ -15,6 +15,13 @@ int main(int argc, char** argv){
 		fprintf(stderr, "ERROR: Invalid port\n");
 	}
 
-	fflush(stderr);
+    fflush(stderr);
+    
+    if (pthread_mutex_init(&_AccountsLock, NULL) != 0) { 
+        fprintf(stderr, "Could not initialize mutex for account locking\n"); 
+        fprintf(stdout, "Could not initialize mutex for account locking\n"); 
+        return 1; 
+    }
+    
     return 0;
 }
