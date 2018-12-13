@@ -232,8 +232,13 @@ void* getUserInput(void* arguments) {
         command[0] = '\0';
         userInput[0] = '\0';
         fprintf(stdout,"Enter commands\n");
-        fgets(userInput, 256, stdin);
+        fgets(userInput, 266, stdin);
         sscanf("%s %s", command, userInput);
+        char* newCommand = (char*) malloc(10 * sizeof(char));
+        strcpy(newCommand, command);
+        char* newInput = (char*) malloc(255 * sizeof(char));
+        strcpy(newInput, userInput);
+
         // Error check
         if (strlen(command) == 0 || strlen(userInput) == 0) {
             returnError(70);
@@ -243,32 +248,31 @@ void* getUserInput(void* arguments) {
         if ((strcmp(command, "create") == 0) && state == 0) {
             state = 0;
             
-            // createAccount()
+            CreateAccount(&newInput);
 
         } else if ((strcmp(command, "serve") == 0) && state == 0) {
             state = 1;
-
-            // ServeAccount()
+            ServeAccount(&newInput);
 
         } else if ((strcmp(command, "deposit") == 0) && state == 1) {
             state = 0;
-            // Check if user input is float
-            // DepositAccount()
+            double fund = atof(&newInput);
+            DepositAccount(fund);
 
         } else if ((strcmp(command, "withdraw") == 0) && state == 1) {
             state = 0;
-            // Check if user input is float
-            // WithdrawAccount()
+            double fund = atof(&newInput);
+            WithdrawAccount(fund);
 
         } else if ((strcmp(command, "end") == 0) && state == 1){
             state = 0;
 
-            // End()
+            End();
 
         } else if (strcmp(command, "quit") == 0) {
             state = -1;
 
-            // Quit()
+            Quit();
 
         } else {
             // User input command at invalid time
