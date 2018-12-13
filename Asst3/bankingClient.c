@@ -14,7 +14,7 @@ int main(int argc, char** argv){
     int PORT = atoi(argv[2]);
     
 	if (PORT < 1) {
-		fprintf(stderr, "ERROR: Invalid port\n");
+        fprintf(stderr, "ERROR: Invalid port\n");
         fprintf(stdout, "ERROR: Invalid port\n");
         return 1;
 	}
@@ -50,38 +50,18 @@ int main(int argc, char** argv){
 
 	// Connection
     
-    //struct sockaddr_in address; 
-    int sock = 0/*, valread*/; 
-    struct sockaddr_in serv_addr; 
     char *hello = "Hello from client"; 
     char buffer[1024] = {0}; 
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) { 
-        fprintf(stderr, "Socket could not be created\n");
-        fprintf(stdout, "Socket could not be created\n");
-        return -1; 
-    } 
    
-    memset(&serv_addr, '0', sizeof(serv_addr)); 
-   
-    serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(PORT); 
-       
-    // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) <= 0) { 
-        fprintf(stderr, "Invalid address\n");
-        fprintf(stdout, "Invalid address\n");
-        return -1; 
-    } 
-   
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) { 
+    if (connect(socket_fd, (struct sockaddr *)&server, sizeof(server)) < 0) { 
         fprintf(stderr, "Connect failed\n");
         fprintf(stdout, "Connect failed\n");
         return -1; 
     } 
-    send(sock, hello, strlen(hello), 0 ); 
+    send(socket_fd, hello, strlen(hello), 0 ); 
     printf("Hello message sent\n"); 
-    /*valread = */read(sock, buffer, 1024); 
-    printf("%s\n", buffer); 
+    /*valread = */read(socket_fd, buffer, 1024); 
+    printf("%s\n", buffer);
 	
 	/**
 	 * TODO: CONNECT TO SERVER
