@@ -248,20 +248,20 @@ void* getUserInput(void* arguments) {
         if ((strcmp(command, "create") == 0) && state == 0) {
             state = 0;
             
-            CreateAccount(&newInput);
+            CreateAccount(newInput);
 
         } else if ((strcmp(command, "serve") == 0) && state == 0) {
             state = 1;
-            ServeAccount(&newInput);
+            ServeAccount(newInput);
 
         } else if ((strcmp(command, "deposit") == 0) && state == 1) {
             state = 0;
-            double fund = atof(&newInput);
+            double fund = atof(newInput);
             DepositAccount(fund);
 
         } else if ((strcmp(command, "withdraw") == 0) && state == 1) {
             state = 0;
-            double fund = atof(&newInput);
+            double fund = atof(newInput);
             WithdrawAccount(fund);
 
         } else if ((strcmp(command, "end") == 0) && state == 1){
